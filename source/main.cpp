@@ -7,16 +7,16 @@ int main(int argc, char* argv[])
 {
     std::cout << "Hello World" << std::endl;
 
-    std::vector<std::string> args;
+    std::vector<std::string> cmd_args;
 
     for (int i = 0; i < argc; i++)
     {
-        args.emplace_back(std::string(argv[i]));
+        cmd_args.emplace_back(std::string(argv[i]));
     }
 
-    for (int i = 0; i < args.size(); i++)
+    for (int i = 0; i < cmd_args.size(); i++)
     {
-        std::cout << std::format("Arg {}: {}", i, argv[i]) << std::endl;
+        std::cout << std::format("Arg {}: {}", i, cmd_args[i]) << std::endl;
     }
 
     return 0;

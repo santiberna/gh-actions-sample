@@ -5,20 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb-dap",
+            "name": "Launch Debug",
+            "type": "lldb",
             "request": "launch",
-            "name": "Debug",
             "program": "${workspaceFolder}/build/x64-Debug/App.exe",
             "args": [ "one", "two", "three" ],
-            "preLaunchTask": "Build Debug"
+            "preLaunchTask": "Build Debug",
+            "cwd": "${workspaceFolder}"
         },
         {
-            "type": "lldb-dap",
+            "name": "Launch Release",
+            "type": "lldb",
             "request": "launch",
-            "name": "Release",
-            "program": "${workspaceFolder}/build/x64-Release/App.exe",
+            "program": "${workspaceFolder}/build/x64-Debug/App.exe",
             "args": [ "one", "two", "three" ],
-            "preLaunchTask": "Build Release"
+            "preLaunchTask": "Build Debug",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
