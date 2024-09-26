@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            "type": "process",
+            "label": "Build Debug",
+            "args": ["scripts/build.py", "x64-Debug"],
+            "command": "python",
+        },
+        {
+            "type": "process",
+            "label": "Build Release",
+            "args": ["scripts/build.py", "x64-Release"],
+            "command": "python",
+        },
+    ]
+}
