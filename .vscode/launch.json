@@ -6,21 +6,39 @@
     "configurations": [
         {
             "name": "Launch Debug",
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/x64-Debug/App.exe",
-            "args": [ "one", "two", "three" ],
-            "preLaunchTask": "Build Debug",
-            "cwd": "${workspaceFolder}"
+            "args": ["one", "two", "three"],
+            "cwd": "${workspaceFolder}",
+            
+            "MIMode": "gdb",
+
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ]
         },
         {
             "name": "Launch Release",
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/x64-Debug/App.exe",
-            "args": [ "one", "two", "three" ],
-            "preLaunchTask": "Build Debug",
-            "cwd": "${workspaceFolder}"
-        }
+            "program": "${workspaceFolder}/build/x64-Release/App.exe",
+            "args": ["one", "two", "three"],
+            "cwd": "${workspaceFolder}",
+            
+            "MIMode": "gdb",
+
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ]
+        },
     ]
 }
