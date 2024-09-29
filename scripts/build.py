@@ -1,8 +1,6 @@
 import sys
 import subprocess
 
-DEBUG = "x64-Debug"
-RELEASE = "x64-Release"
 
 COMPILE_SUCCESS = "Project compilation succeded"
 COMPILE_FAIL = "Project failed to compile"
@@ -12,6 +10,9 @@ CONFIGURE_FAIL = "Failed to configure build files"
 
 def configure(config):
     return subprocess.run(["cmake", "--preset=" + config]).returncode
+
+def clean(config):
+    return subprocess.run(["cmake", "--build", "build/" + config, "--target clean"]).returncode
 
 def build(config):
     return subprocess.run(["cmake", "--build", "build/" + config]).returncode
@@ -26,9 +27,16 @@ def check(code, success_message, fail_message):
 
 def main():
     preset = sys.argv[1]
-    check(configure(preset), CONFIGURE_SUCCESS, CONFIGURE_FAIL)
-    check(build(preset), COMPILE_SUCCESS, COMPILE_FAIL)
+
+    if (preset == "Clean"):
+        clean("Debug")
+        clean("Release")
+    else:
+        check(configure(preset), CONFIGURE_SUCCESS, CONFIGURE_FAIL)
+        check(build(preset), COMPILE_SUCCESS, COMPILE_FAIL)
     
 
 if __name__ == "__main__":
     main()
+
+    # cmake --build C:/foo/build/ --target clean

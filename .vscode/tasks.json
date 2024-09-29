@@ -13,5 +13,11 @@
             "args": ["scripts/build.py", "Release"],
             "command": "python",
         },
+        {
+            "type": "process",
+            "label": "Clean CMake Cache",
+            "args": ["scripts/build.py", "Clean"],
+            "command": "python",
+        },
     ]
 }

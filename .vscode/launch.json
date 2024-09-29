@@ -8,7 +8,7 @@
             "name": "Launch Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/x64-Debug/App.exe",
+            "program": "${workspaceFolder}/build/Debug/App.exe",
             "args": ["one", "two", "three"],
             "cwd": "${workspaceFolder}",
             
@@ -27,7 +27,7 @@
             "name": "Launch Release",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/x64-Release/App.exe",
+            "program": "${workspaceFolder}/build/Release/App.exe",
             "args": ["one", "two", "three"],
             "cwd": "${workspaceFolder}",
             
