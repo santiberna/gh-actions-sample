@@ -1,4 +1,3 @@
-#include <format>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -16,7 +15,7 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < cmd_args.size(); i++)
     {
-        std::cout << std::format("Arg {}: {}", i, cmd_args[i]) << std::endl;
+        std::cout << /*std::format("Arg {}: {}", i, cmd_args[i])*/ cmd_args[i] << std::endl;
     }
 
     return 0;
