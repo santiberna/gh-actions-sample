@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
 
 int main(int argc, char* argv[])
@@ -15,6 +16,8 @@ int main(int argc, char* argv[])
 
     if (false)
     {
+        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
         vk::ApplicationInfo appInfo = {};
         appInfo.pApplicationName = "My Vulkan Application"; // Application name
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0); // Application version
@@ -27,6 +30,8 @@ int main(int argc, char* argv[])
 
         vk::Instance instance = vk::createInstance(createInfo);
         instance.destroy();
+
+        SDL_Quit();
     }
 
     return 0;
