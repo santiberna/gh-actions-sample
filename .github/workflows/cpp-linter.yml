@@ -16,14 +16,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ... optionally setup build env to create a compilation database
+      - name: Setup database
+        run: cmake --preset Release
 
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-
+          database: build/Release/compile_commands.json
           ignore: 'third-party'
           tidy-checks: '' # Use .clang-tidy config file. 
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
