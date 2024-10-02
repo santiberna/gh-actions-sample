@@ -1,7 +1,7 @@
 #include "graph.hpp"
 
 #include <iostream>
-#include <format>
+#include "format.hpp"
 
 AdjacencyMatrix::AdjacencyMatrix(size_t size)
     : width(size)
@@ -61,7 +61,7 @@ void AdjacencyMatrix::Print()
         for (int x = 0; x < width; x++)
         {
             float val = *At(x, y);
-            std::cout << std::format("{:03} ", val);
+            std::cout << fmt::format("{:03} ", val);
         }
         std::cout << "\n";
     }
