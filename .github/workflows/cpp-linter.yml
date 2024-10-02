@@ -17,6 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        
       - name: Setup database
         run: cmake --preset Release
 
