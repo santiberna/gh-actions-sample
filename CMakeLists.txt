@@ -3,8 +3,6 @@ project(Project)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Vulkan REQUIRED)
-
 add_executable(App)
 
 file(GLOB_RECURSE sources CONFIGURE_DEPENDS "source/*.cpp")
