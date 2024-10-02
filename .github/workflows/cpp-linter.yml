@@ -29,6 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          version: 18
+          extensions: 'h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
           files-changed-only: false
           database: build/Release/compile_commands.json
           style: 'file'

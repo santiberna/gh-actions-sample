@@ -19,6 +19,10 @@ misc-*,
 -misc-include-cleaner,
 
 bugprone-*
+
+cppcoreguidelines-*
+clang-analyzer-*
+
 '
 
 CheckOptions:
