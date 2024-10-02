@@ -1,6 +1,6 @@
 #include "json.hpp"
 
-#include <format>
+#include "format.hpp"
 #include <charconv>
 
 constexpr int STRING_STARTER = '\"';
@@ -356,7 +356,7 @@ std::optional<JSONParser::LITERAL> JSONParser::ParseLiteral(std::istream& stream
         return LITERAL::TRUE;
     else
     {
-        ErrorLog(std::format("Unknown literal found: \"{}\"", literalBuf));
+        ErrorLog(fmt::format("Unknown literal found: \"{}\"", literalBuf));
         return std::nullopt;
     }
 }

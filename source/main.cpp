@@ -873,7 +873,7 @@ void C11()
     auto CheckDoublePair = [](const std::vector<int>& digits)
     {
         int pairs = 0;
-        for (int i = 0; i < digits.size() - 1; ++i)
+        for (int i = 0; i < (int)digits.size() - 1; ++i)
         {
             int current = digits.at(i);
             int next = digits.at(i + 1);

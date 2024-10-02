@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <format>
+#include "format.hpp"
 #include <vector>
 #include <optional>
 
@@ -97,7 +97,7 @@ public:
         {
             for (size_t c = 0; c < C; c++)
             {
-                stream << std::format("{:03} ", At(r, c)) << " ";
+                stream << fmt::format("{:03} ", At(r, c)) << " ";
             }
             stream << "\n";
         }
@@ -170,7 +170,7 @@ public:
         {
             for (size_t x = 0; x < width; x++)
             {
-                std::cout << std::format("{:03} ", *At(x, y));
+                std::cout << fmt::format("{:03} ", *At(x, y));
             }
             std::cout << "\n";
         }

@@ -10,5 +10,5 @@ file(GLOB_RECURSE headers CONFIGURE_DEPENDS "source/*.hpp")
 
 target_sources(App PRIVATE ${headers} ${sources})
 
-target_include_directories(App PRIVATE ${Vulkan_INCLUDE_DIR})
+target_include_directories(App PRIVATE "third-party")
 target_compile_features(App PRIVATE cxx_std_20)
