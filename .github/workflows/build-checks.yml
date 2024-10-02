@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [ "main" ]
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.cxx', '**.hxx', '**.cc', '**.hh', '**CMakeLists.txt', '**.cmake']
 
 jobs:
   build:
