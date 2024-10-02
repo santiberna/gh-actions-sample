@@ -2,7 +2,7 @@
 #include <bit>
 
 #include "log.hpp"
-#include <format>
+#include "format.hpp"
 
 constexpr std::array<uint8_t, 64> PADDING = { 0x80 };
 
@@ -193,7 +193,7 @@ std::string FormatHash(const Hash128& hash)
     std::string out {};
     for (auto n : hash.as_bytes)
     {
-        out += std::format("{:02x}", n);
+        out += std::string(fmt::format("{:02x}", n));
     }
     return out;
 }
