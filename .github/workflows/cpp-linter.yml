@@ -23,7 +23,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          style: 'file'  # Use .clang-format config file. 
+          ignore: 'third-party'
+          style: 'file:.clang-format'  # Use .clang-format config file. 
           tidy-checks: '-*' # Use .clang-tidy config file. 
           # only 'update' a single comment in a pull request's thread. 
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}

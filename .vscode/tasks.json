@@ -2,22 +2,19 @@
 	"version": "2.0.0",
 	"tasks": [
         {
-            "type": "process",
+            "type": "shell",
             "label": "Build Debug",
-            "args": ["scripts/build.py", "Debug"],
-            "command": "python",
+            "command": "cmake --preset Debug; cmake --build build/Debug",
         },
         {
-            "type": "process",
+            "type": "shell",
             "label": "Build Release",
-            "args": ["scripts/build.py", "Release"],
-            "command": "python",
+            "command": "cmake --preset Release; cmake --build build/Release",
         },
         {
-            "type": "process",
+            "type": "shell",
             "label": "Clean CMake Cache",
-            "args": ["scripts/build.py", "Clean"],
-            "command": "python",
+            "command": "cmake --build build/Debug --target clean; cmake --build build/Release --target clean",
         },
     ]
 }
