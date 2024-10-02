@@ -19,7 +19,7 @@ jobs:
 
       - name: Setup Ninja
         uses: ashutoshvarma/setup-ninja@master
-        
+
       - name: Setup database
         run: cmake --preset Release
 
@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           database: build/Release/compile_commands.json
+          style: 'file'
           ignore: 'third-party'
-          tidy-checks: '' # Use .clang-tidy config file. 
+          tidy-checks: '' 
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
