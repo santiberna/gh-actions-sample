@@ -14,12 +14,14 @@ jobs:
     permissions: 
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup database
         run: cmake --preset Release
 
-      - uses: cpp-linter/cpp-linter-action@v2
+      - name: CPP-Linter
+        uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
