@@ -25,7 +25,7 @@ jobs:
         with:
 
           ignore: 'third-party'
-          style: 'file:.clang-format'  # Use .clang-format config file. 
+          style: 'file'  # Use .clang-format config file. 
           tidy-checks: '-*' # Use .clang-tidy config file. 
     
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
