@@ -3,6 +3,7 @@
 #include "format.hpp"
 #include <vector>
 #include <optional>
+#include <array>
 
 inline int PowerOfInt(int i, int n)
 {
