@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #include <string>
 #include <variant>
 #include <vector>
@@ -15,28 +16,28 @@ struct JSONValue
         std::string,
         std::vector<JSONValue>,
         std::unordered_map<std::string, JSONValue>>
-        data;
+        m_data;
 
-    bool IsNull() const { return std::holds_alternative<std::monostate>(data); }
-    bool IsBool() const { return std::holds_alternative<bool>(data); }
-    bool IsNumber() const { return std::holds_alternative<double>(data); }
-    bool IsString() const { return std::holds_alternative<std::string>(data); }
-    bool IsArray() const { return std::holds_alternative<std::vector<JSONValue>>(data); }
-    bool IsObject() const { return std::holds_alternative<std::unordered_map<std::string, JSONValue>>(data); }
+    [[nodiscard]] bool is_null() const { return std::holds_alternative<std::monostate>(m_data); }
+    [[nodiscard]] bool is_bool() const { return std::holds_alternative<bool>(m_data); }
+    [[nodiscard]] bool is_number() const { return std::holds_alternative<double>(m_data); }
+    [[nodiscard]] bool is_string() const { return std::holds_alternative<std::string>(m_data); }
+    [[nodiscard]] bool is_array() const { return std::holds_alternative<std::vector<JSONValue>>(m_data); }
+    [[nodiscard]] bool is_object() const { return std::holds_alternative<std::unordered_map<std::string, JSONValue>>(m_data); }
 };
 
 class JSONParser
 {
 public:
     JSONParser(std::ostream* error_log = nullptr)
-        : error_log(error_log) { };
-    std::optional<JSONValue> ParseValue(std::istream& stream);
+        : m_error_log(error_log) { };
+    std::optional<JSONValue> parse_value(std::istream& stream);
 
 private:
-    std::optional<std::unordered_map<std::string, JSONValue>> ParseObject(std::istream& stream);
-    std::optional<std::vector<JSONValue>> ParseArray(std::istream& stream);
-    std::optional<std::string> ParseString(std::istream& stream);
-    std::optional<double> ParseNumber(std::istream& stream);
+    std::optional<std::unordered_map<std::string, JSONValue>> parse_object(std::istream& stream);
+    std::optional<std::vector<JSONValue>> parse_array(std::istream& stream);
+    std::optional<std::string> parse_string(std::istream& stream);
+    std::optional<double> parse_number(std::istream& stream);
 
     enum class LITERAL
     {
@@ -44,18 +45,19 @@ private:
         FALSE,
         TRUE
     };
-    std::optional<LITERAL> ParseLiteral(std::istream& stream);
+    std::optional<LITERAL> parse_literal(std::istream& stream);
 
-    void SkipWhiteSpace(std::istream& stream);
+    static void skip_white_space(std::istream& stream);
 
-    std::optional<int> ReadStream(std::istream& stream);
-    void PopStream(std::istream& stream);
+    std::optional<int> read_stream(std::istream& stream);
+    static void pop_stream(std::istream& stream);
 
     template <typename T>
-    void ErrorLog(const T& v)
+    void error_log(const T& v)
     {
-        if (error_log)
-            (*error_log) << v << " ";
+        if (m_error_log) {
+            (*m_error_log) << v << " ";
+}
     }
-    std::ostream* error_log = nullptr;
+    std::ostream* m_error_log = nullptr;
 };

@@ -1,7 +1,16 @@
 #include "json.hpp"
 
+#include "fmt/format.h"
 #include "format.hpp"
+#include <cctype>
 #include <charconv>
+#include <string>
+#include <optional>
+#include <istream>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+#include <system_error>
 
 constexpr int STRING_STARTER = '\"';
 constexpr int STRING_ENDER = '\"';
@@ -278,10 +287,10 @@ std::optional<std::string> JSONParser::ParseString(std::istream& stream)
             complete = true;
             break;
         }
-        else
-        {
+        
+        
             out += new_char.value();
-        }
+       
     }
 
     if (!complete)
@@ -294,14 +303,14 @@ std::optional<std::string> JSONParser::ParseString(std::istream& stream)
 
 std::optional<double> JSONParser::ParseNumber(std::istream& stream)
 {
-    std::string numBuf {};
+    std::string num_buf {};
 
     while (auto c = ReadStream(stream))
     {
-        if (std::isdigit(c.value()) || c.value() == NEGATIVE_SIGN || c.value() == 'e' || c.value() == 'E' || c.value() == POSITIVE_SIGN || c.value() == '.')
+        if ((std::isdigit(c.value()) != 0) || c.value() == NEGATIVE_SIGN || c.value() == 'e' || c.value() == 'E' || c.value() == POSITIVE_SIGN || c.value() == '.')
         {
             PopStream(stream);
-            numBuf += c.value();
+            num_buf += c.value();
         }
         else
         {
@@ -310,25 +319,26 @@ std::optional<double> JSONParser::ParseNumber(std::istream& stream)
     }
 
     double out {};
-    auto result = std::from_chars(numBuf.data(), numBuf.data() + numBuf.size(), out);
+    auto result = std::from_chars(num_buf.data(), num_buf.data() + num_buf.size(), out);
 
     if (result.ec == std::errc {})
     {
         return out;
     }
-    else
-    {
+    
+    
         ErrorLog("Failed to parse number");
         return std::nullopt;
-    }
+   
 }
 
 void JSONParser::SkipWhiteSpace(std::istream& stream)
 {
     while (stream)
     {
-        if (!std::isspace(stream.peek()))
+        if (std::isspace(stream.peek()) == 0) {
             break;
+}
         stream.get();
     }
 }
@@ -339,7 +349,7 @@ std::optional<JSONParser::LITERAL> JSONParser::ParseLiteral(std::istream& stream
 
     while (auto c = ReadStream(stream))
     {
-        if (c.value() == ELEMENT_SEPARATOR || std::isspace(c.value()))
+        if (c.value() == ELEMENT_SEPARATOR || (std::isspace(c.value()) != 0))
         {
             break;
         }
@@ -348,9 +358,9 @@ std::optional<JSONParser::LITERAL> JSONParser::ParseLiteral(std::istream& stream
         literalBuf += c.value();
     }
 
-    if (literalBuf == NULL_LITERAL)
+    if (literalBuf == NULL_LITERAL) {
         return LITERAL::NONE;
-    else if (literalBuf == FALSE_LITERAL)
+    } if (literalBuf == FALSE_LITERAL)
         return LITERAL::FALSE;
     else if (literalBuf == TRUE_LITERAL)
         return LITERAL::TRUE;
@@ -370,10 +380,10 @@ std::optional<int> JSONParser::ReadStream(std::istream& stream)
         {
             return std::nullopt;
         }
-        else
-        {
+        
+        
             return c;
-        }
+       
     }
     else
     {
@@ -383,6 +393,7 @@ std::optional<int> JSONParser::ReadStream(std::istream& stream)
 }
 void JSONParser::PopStream(std::istream& stream)
 {
-    if (stream)
+    if (stream) {
         stream.get();
+}
 }

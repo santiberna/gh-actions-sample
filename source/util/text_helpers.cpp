@@ -1,11 +1,23 @@
 #include "text_helpers.hpp"
+#include <optional>
+#include <fstream>
+#include <filesystem>
+#include <ios>
+#include <vector>
+#include <string>
+#include <istream>
+#include <utility>
+#include <sstream>
+#include <cstddef>
+#include <functional>
+#include <string_view>
 
 std::optional<std::ifstream> OpenFileReadStream(const std::filesystem::path& path, std::ios_base::openmode flags)
 {
     std::ifstream s = std::ifstream(path.string(), flags);
-    if (s)
+    if (s) {
         return s;
-    else
+    } 
         return std::nullopt;
 }
 
@@ -39,7 +51,7 @@ std::string ReplaceAll(std::string str, const std::string& search, const std::st
     return str;
 }
 
-void ForeachLine(std::istream& stream, std::function<void(const std::string& line)> fn, char delimiter)
+void ForeachLine(std::istream& stream, const std::function<void(const std::string& line)>& fn, char delimiter)
 {
     std::string temp {};
     while (std::getline(stream, temp, delimiter))

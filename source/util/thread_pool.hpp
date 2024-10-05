@@ -1,10 +1,12 @@
 #pragma once
+#include <cstdint>
 #include <memory>
 #include <thread>
 #include <mutex>
 #include <functional>
 #include <future>
 #include <condition_variable>
+#include <type_traits>
 #include <vector>
 #include <queue>
 
@@ -17,16 +19,16 @@ class Task
 public:
     template <typename F>
     Task(F&& f)
-        : callable(new F(std::forward<F>(f)), [](void* p)
+        : m_callable(new F(std::forward<F>(f)), [](void* p)
               { delete static_cast<F*>(p); })
-        , invoke([](void* ptr)
+        , m_invoke([](void* ptr)
               { (*static_cast<F*>(ptr))(); })
     {
     }
 
     void operator()() const
     {
-        invoke(callable.get());
+        m_invoke(m_callable.get());
     }
 
     Task(Task&&) = default;
@@ -36,8 +38,8 @@ public:
     ~Task() = default;
 
 private:
-    CallablePtr callable;
-    InvokeFn* invoke = nullptr;
+    CallablePtr m_callable;
+    InvokeFn* m_invoke = nullptr;
 };
 
 class ThreadPool
@@ -48,39 +50,39 @@ public:
     ThreadPool(const ThreadPool&) = delete;
 
     template <typename F, typename... Args>
-    decltype(auto) QueueTask(F&& callable, Args&&... args);
+    decltype(auto) queue_task(F&& callable, Args&&... args);
 
-    auto GetNumThreadsWorking() const { return threads_working.load(); }
-    auto GetNumThreads() const { return workers.size(); }
+    auto get_num_threads_working() const { return m_threads_working.load(); }
+    auto get_num_threads() const { return m_workers.size(); }
 
 private:
     void worker_loop();
-    bool exit_code = false;
+    bool m_exit_code = false;
 
-    std::mutex queue_mutex;
-    std::condition_variable worker_signal;
+    std::mutex m_queue_mutex;
+    std::condition_variable m_worker_signal;
 
-    std::vector<std::thread> workers;
-    std::queue<Task> tasks;
+    std::vector<std::thread> m_workers;
+    std::queue<Task> m_tasks;
 
-    std::atomic_size_t threads_working { 0 };
+    std::atomic_size_t m_threads_working { 0 };
 };
 
 template <typename F, typename... Args>
-decltype(auto) ThreadPool::QueueTask(F&& callable, Args&&... args)
+decltype(auto) ThreadPool::queue_task(F&& callable, Args&&... args)
 {
     using ReturnType = std::invoke_result_t<F, Args...>;
 
     std::packaged_task<ReturnType()> task(std::bind(std::forward<F>(callable), std::forward<Args>(args)...));
-    auto taskFuture = task.get_future();
+    auto task_future = task.get_future();
 
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-        tasks.emplace(std::move(task));
+        std::unique_lock<std::mutex> const lock(m_queue_mutex);
+        m_tasks.emplace(std::move(task));
     }
 
-    worker_signal.notify_one();
-    return taskFuture;
+    m_worker_signal.notify_one();
+    return task_future;
 }
 
 inline ThreadPool threads { std::thread::hardware_concurrency() };

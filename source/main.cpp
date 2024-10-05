@@ -1,16 +1,26 @@
+#include <algorithm>
+#include <algorithm>
 #include <array>
-#include <bit>
+#include <cctype>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
+#include <cstdint>
+#include <cstddef>
 #include <functional>
 #include <iostream>
-#include <map>
+#include <limits>
+#include <mutex>
+#include <memory>
 #include <numeric>
 #include <optional>
-#include <set>
+#include <queue>
+#include <sstream>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -23,10 +33,10 @@
 #include "util/text_helpers.hpp"
 #include "util/thread_pool.hpp"
 
-namespace Y2015
+namespace y2015
 {
 
-void C1()
+static void c1()
 {
     auto input = OpenFileReadStream("input/2015/1.txt");
     if (input)
@@ -41,10 +51,12 @@ void C1()
         {
             for (auto c : line)
             {
-                if (c == '(')
+                if (c == '(') {
                     sum++;
-                if (c == ')')
+}
+                if (c == ')') {
                     sum--;
+}
 
                 counter++;
                 if (sum == -1 && !first)
@@ -60,7 +72,7 @@ void C1()
     Log("Challenge One Complete");
 }
 
-void C2()
+static void c2()
 {
     auto input = OpenFileReadStream("input/2015/2.txt");
     std::vector<Box> volumes;
@@ -76,9 +88,9 @@ void C2()
             if (numbers.size() >= 3)
             {
                 Box n {};
-                n.x = ParseNumber<float>(numbers[0]).value_or(0.0f);
-                n.y = ParseNumber<float>(numbers[1]).value_or(0.0f);
-                n.z = ParseNumber<float>(numbers[2]).value_or(0.0f);
+                n.x = ParseNumber<float>(numbers[0]).value_or(0.0F);
+                n.y = ParseNumber<float>(numbers[1]).value_or(0.0F);
+                n.z = ParseNumber<float>(numbers[2]).value_or(0.0F);
                 volumes.emplace_back(n);
             }
         }
@@ -97,7 +109,7 @@ void C2()
     Log("Challenge Two Complete");
 }
 
-void C3()
+static void c3()
 {
     auto input = OpenFileReadStream("input/2015/3.txt");
     std::vector<IVec2> moves[2] { {}, {} };
@@ -132,7 +144,7 @@ void C3()
         }
     }
 
-    auto current = IVec2 { 0, 0 };
+    auto current = IVec2 { .x=0, .y=0 };
     std::unordered_set<IVec2> positions_reached { current };
 
     for (auto move : moves[0])
@@ -141,7 +153,7 @@ void C3()
         positions_reached.insert(current);
     }
 
-    current = IVec2 { 0, 0 };
+    current = IVec2 { .x=0, .y=0 };
 
     for (auto move : moves[1])
     {
@@ -153,7 +165,7 @@ void C3()
     Log("Challenge Three Complete");
 }
 
-void C4()
+static void c4()
 {
     std::string base = "ckczppom";
     auto start = std::chrono::high_resolution_clock::now();
@@ -164,20 +176,20 @@ void C4()
 
     uint32_t result {};
 
-    auto find_hash = [&](std::string base, uint32_t start, uint32_t increment)
+    auto find_hash = [&](const std::string& base, uint32_t start, uint32_t increment)
     {
         uint32_t i = start;
         while (run)
         {
-            std::string test_key = base + std::to_string(i);
+            std::string const test_key = base + std::to_string(i);
             auto n = MD5Hash(StringToBytes(test_key));
 
-            bool check_zeros = n.as_bytes[0] == 0 && n.as_bytes[1] == 0 && n.as_bytes[2] == 0;
+            bool const check_zeros = n.as_bytes[0] == 0 && n.as_bytes[1] == 0 && n.as_bytes[2] == 0;
 
             if (check_zeros)
             {
                 {
-                    std::scoped_lock<std::mutex> lock(result_mutex);
+                    std::scoped_lock<std::mutex> const lock(result_mutex);
                     run = false;
                     result = i;
                 }
@@ -190,7 +202,7 @@ void C4()
 
     for (uint32_t i = 0; i < threads.GetNumThreads(); i++)
     {
-        uint32_t incr = (uint32_t)threads.GetNumThreads();
+        auto incr = (uint32_t)threads.GetNumThreads();
         uint32_t start = i;
 
         threads.QueueTask(find_hash, base, start, incr);
@@ -201,7 +213,7 @@ void C4()
     {
         std::unique_lock<std::mutex> lock { result_mutex };
         await_result.wait(lock, [&]()
-            { return run == false; });
+            { return !run; });
     }
 
     auto time = std::chrono::high_resolution_clock::now() - start;
@@ -211,7 +223,7 @@ void C4()
     Log("Challenge 4 Complete");
 }
 
-void C5()
+static void c5()
 {
     std::vector<std::string> strings;
 
@@ -222,23 +234,24 @@ void C5()
 
     // Part 1
     {
-        std::vector<std::string> bad_words { "ab", "cd", "pq", "xy" };
+        std::vector<std::string> const bad_words { "ab", "cd", "pq", "xy" };
 
         auto check_word1 = [=](const std::string& t)
         {
             // Check for bad words
-            for (auto& bad : bad_words)
+            for (const auto& bad : bad_words)
             {
-                if (t.find(bad) != std::string::npos)
+                if (t.find(bad) != std::string::npos) {
                     return false;
+}
             }
 
             // Twice in a row
             bool has_row = false;
             for (size_t i = 0; i < t.size() - 1; i++)
             {
-                char current = t[i];
-                char next = t[i + 1];
+                char const current = t[i];
+                char const next = t[i + 1];
 
                 if (current == next)
                 {
@@ -247,27 +260,28 @@ void C5()
                 }
             }
 
-            if (!has_row)
+            if (!has_row) {
                 return false;
+}
 
             // Three vowels
             size_t vowel_count = 0;
             for (auto c : t)
             {
-                bool is_vowel = c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
-                if (is_vowel)
+                bool const is_vowel = c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+                if (is_vowel) {
                     vowel_count++;
+}
             }
 
-            if (vowel_count >= 3)
-                return true;
-            return false;
+            return vowel_count >= 3;
         };
         uint32_t good = 0;
         for (auto& str : strings)
         {
-            if (check_word1(str))
+            if (check_word1(str)) {
                 good++;
+}
         }
         Log("Number of Nice Words: {}", good);
     }
@@ -278,9 +292,10 @@ void C5()
         {
             using Pair = std::tuple<std::string, size_t>;
             std::vector<Pair> out {};
-            for (size_t i = 0; i < t.size() - 1; i++)
+            out.reserve(t.size() - 1);
+for (size_t i = 0; i < t.size() - 1; i++)
             {
-                out.push_back({ t.substr(i, 2), i });
+                out.emplace_back( t.substr(i, 2), i );
             }
             return out;
         };
@@ -291,10 +306,10 @@ void C5()
             std::vector<Triplet> out {};
             for (size_t i = 0; i < t.size() - 2; i++)
             {
-                char a = t[i];
-                char b = t[i + 1];
-                char c = t[i + 2];
-                out.push_back({ a, b, c });
+                char const a = t[i];
+                char const b = t[i + 1];
+                char const c = t[i + 2];
+                out.emplace_back( a, b, c );
             }
             return out;
         };
@@ -307,10 +322,10 @@ void C5()
             // Find identical pairs
 
             bool found = false;
-            for (auto [n, i] : pairs)
+            for (const auto& [n, i] : pairs)
             {
-                size_t index = t.find(n, i + 2);
-                bool valid = index != std::string::npos;
+                size_t const index = t.find(n, i + 2);
+                bool const valid = index != std::string::npos;
                 if (valid)
                 {
                     found = true;
@@ -318,13 +333,15 @@ void C5()
                 }
             }
 
-            if (!found)
+            if (!found) {
                 return false;
+}
 
-            for (auto [a, b, c] : triples)
+            for (const auto& [a, b, c] : triples)
             {
-                if (a == c)
+                if (a == c) {
                     return true;
+}
             }
             return false;
         };
@@ -332,8 +349,9 @@ void C5()
         uint32_t great = 0;
         for (auto& str : strings)
         {
-            if (evaluate(str))
+            if (evaluate(str)) {
                 great++;
+}
         }
 
         Log("Number of Great Words: {}", great);
@@ -341,7 +359,7 @@ void C5()
     Log("Challenge 5 Complete");
 }
 
-void C6()
+static void c6()
 {
     enum class Instruction
     {
@@ -352,9 +370,9 @@ void C6()
     };
     struct Entry
     {
-        Instruction instruction;
-        IVec2 start;
-        IVec2 end;
+        Instruction m_instruction;
+        IVec2 m_start;
+        IVec2 m_end;
     };
 
     std::vector<Entry> entries;
@@ -367,8 +385,8 @@ void C6()
 
         if (numbers.size() >= 4)
         {
-            auto start = IVec2 { numbers[0], numbers[1] };
-            auto end = IVec2 { numbers[2], numbers[3] };
+            auto start = IVec2 { .x=numbers[0], .y=numbers[1] };
+            auto end = IVec2 { .x=numbers[2], .y=numbers[3] };
 
             auto type = Instruction::NONE;
 
@@ -400,46 +418,54 @@ void C6()
 
     for (auto entry : entries)
     {
-        switch (entry.instruction)
+        switch (entry.m_instruction)
         {
         case Instruction::TOGGLE:
         {
-            for (auto y = entry.start.y; y <= entry.end.y; y++)
-                for (auto x = entry.start.x; x <= entry.end.x; x++)
+            for (auto y = entry.m_start.y; y <= entry.m_end.y; y++) {
+                for (auto x = entry.m_start.x; x <= entry.m_end.x; x++) {
                     (*light_grid)[y][x] += 2;
+}
+}
             break;
         }
         case Instruction::ON:
         {
-            for (auto y = entry.start.y; y <= entry.end.y; y++)
-                for (auto x = entry.start.x; x <= entry.end.x; x++)
+            for (auto y = entry.m_start.y; y <= entry.m_end.y; y++) {
+                for (auto x = entry.m_start.x; x <= entry.m_end.x; x++) {
                     (*light_grid)[y][x] += 1;
+}
+}
             break;
         }
         case Instruction::OFF:
         {
-            for (auto y = entry.start.y; y <= entry.end.y; y++)
-                for (auto x = entry.start.x; x <= entry.end.x; x++)
+            for (auto y = entry.m_start.y; y <= entry.m_end.y; y++) {
+                for (auto x = entry.m_start.x; x <= entry.m_end.x; x++)
                 {
                     auto& ref = (*light_grid)[y][x];
-                    if (ref > 0)
+                    if (ref > 0) {
                         ref -= 1;
+}
                 }
+}
             break;
         }
         }
     }
 
     size_t count = 0;
-    for (auto& arr : *light_grid)
-        for (auto e : arr)
+    for (auto& arr : *light_grid) {
+        for (auto e : arr) {
             count += e;
+}
+}
 
     Log("Total Light: {}", count);
     Log("Challenge 6 Complete");
 }
 
-void C7()
+static void c7()
 {
     std::vector<std::string> lines;
     if (auto input = OpenFileReadStream("input/2015/7.txt"))
@@ -458,13 +484,13 @@ void C7()
     };
     struct BinaryOp
     {
-        std::string first, second;
-        Operation op;
+        std::string m_first, m_second;
+        Operation m_op;
     };
     struct UnaryOp
     {
-        std::string var;
-        Operation op;
+        std::string m_var;
+        Operation m_op;
     };
 
     using Term = std::variant<uint16_t, std::string, BinaryOp, UnaryOp>;
@@ -473,7 +499,7 @@ void C7()
     for (auto& str : lines)
     {
         auto tokens = SplitString(str, " ");
-        size_t token_count = tokens.size();
+        size_t const token_count = tokens.size();
 
         if (token_count == 3) // n -> var
         {
@@ -488,30 +514,30 @@ void C7()
         }
         else if (token_count == 4) // NOT n -> var
         {
-            circuit.emplace(tokens.back(), UnaryOp { tokens.at(1), Operation::NOT });
+            circuit.emplace(tokens.back(), UnaryOp { .var=tokens.at(1), .op=Operation::NOT });
         }
         else if (token_count == 5)
         {
             BinaryOp op {};
-            op.first = tokens.front();
-            op.second = tokens.at(2);
+            op.m_first = tokens.front();
+            op.m_second = tokens.at(2);
 
             auto& operand = tokens.at(1);
             if (operand == "AND")
             {
-                op.op = Operation::AND;
+                op.m_op = Operation::AND;
             }
             else if (operand == "OR")
             {
-                op.op = Operation::OR;
+                op.m_op = Operation::OR;
             }
             else if (operand == "RSHIFT")
             {
-                op.op = Operation::RSHIFT;
+                op.m_op = Operation::RSHIFT;
             }
             else if (operand == "LSHIFT")
             {
-                op.op = Operation::LSHIFT;
+                op.m_op = Operation::LSHIFT;
             }
 
             circuit.emplace(tokens.back(), op);
@@ -529,14 +555,14 @@ void C7()
             {
                 return it->second;
             }
-            else
-            {
+            
+            
                 auto& operation = circuit.find(var)->second;
                 auto result = std::visit(*this, operation);
                 cache.emplace(var, result);
 
                 return result;
-            }
+           
         }
 
         uint16_t operator()(uint16_t v) { return v; };
@@ -545,7 +571,7 @@ void C7()
 
         uint16_t operator()(const UnaryOp& v)
         {
-            auto result = solve(v.var);
+            auto result = solve(v.m_var);
             return ~(result);
         };
 
@@ -554,26 +580,26 @@ void C7()
             uint16_t result1 {};
             uint16_t result2 {};
 
-            if (auto n = ParseNumber<uint16_t>(v.first))
+            if (auto n = ParseNumber<uint16_t>(v.m_first))
             {
                 result1 = n.value();
             }
             else
             {
-                result1 = solve(v.first);
+                result1 = solve(v.m_first);
             }
 
-            if (auto n = ParseNumber<uint16_t>(v.second))
+            if (auto n = ParseNumber<uint16_t>(v.m_second))
             {
                 result2 = n.value();
             }
             else
             {
-                const auto& second = (*circuit.find(v.second)).second;
-                result2 = solve(v.second);
+                const auto& second = (*circuit.find(v.m_second)).second;
+                result2 = solve(v.m_second);
             }
 
-            switch (v.op)
+            switch (v.m_op)
             {
             case Operation::AND:
             {
@@ -597,16 +623,16 @@ void C7()
         };
     };
 
-    VisitorSolver solver { circuit };
+    VisitorSolver solver { .circuit=circuit };
 
-    std::string target = "a";
+    std::string const target = "a";
     uint16_t result = solver.solve(target);
     Log("First Run: {}", result);
 
     // Rewire result -> b
 
     circuit["b"] = result;
-    VisitorSolver solver2 { circuit };
+    VisitorSolver solver2 { .circuit=circuit };
 
     uint16_t result2 = solver2.solve(target);
     Log("Second Run: {}", result2);
@@ -614,7 +640,7 @@ void C7()
     Log("Challenge Seven Complete");
 }
 
-void C8()
+static void c8()
 {
     std::vector<std::string> lines;
 
@@ -645,7 +671,7 @@ void C8()
 
             if (num)
             {
-                copy.replace(size_t(it), 4, 1, (char)(num.value()));
+                copy.replace(it, 4, 1, (char)(num.value()));
             }
         }
 
@@ -673,7 +699,7 @@ void C8()
     Log("Challenge Eight Complete");
 }
 
-void C9()
+static void c9()
 {
     std::vector<std::string> lines;
     if (auto in = OpenFileReadStream("input/2015/9.txt"))
@@ -707,16 +733,17 @@ void C9()
     for (auto& str : lines)
     {
         auto tokens = SplitString(str, " ");
-        if (tokens.size() < 5)
+        if (tokens.size() < 5) {
             continue;
+}
 
         auto& from = tokens[0];
         auto& to = tokens[2];
         auto& distance = tokens[4];
 
-        size_t start = places[from];
-        size_t end = places[to];
-        float weight = ParseNumber<float>(distance).value();
+        size_t const start = places[from];
+        size_t const end = places[to];
+        float const weight = ParseNumber<float>(distance).value();
 
         graph.AddUndirectedEdge(start, end, weight);
     }
@@ -726,13 +753,13 @@ void C9()
 
     std::function<void(PathArray & out, const Path& path,
         std::unordered_set<size_t> not_visited)>
-        GeneratePaths;
-    GeneratePaths = [&](PathArray& out, const Path& path,
+        generate_paths;
+    generate_paths = [&](PathArray& out, const Path& path,
                         const std::unordered_set<size_t>& not_visited)
     {
         if (not_visited.empty())
         {
-            out.emplace_back(std::move(path));
+            out.emplace_back(path);
         }
         for (auto i : not_visited)
         {
@@ -742,16 +769,17 @@ void C9()
             copy.push_back(i);
             n.erase(i);
 
-            GeneratePaths(out, copy, n);
+            generate_paths(out, copy, n);
         }
     };
 
     PathArray all_paths {};
     std::unordered_set<size_t> n;
-    for (size_t i = 0; i < graph.GetSize(); i++)
+    for (size_t i = 0; i < graph.GetSize(); i++) {
         n.insert(i);
+}
 
-    GeneratePaths(all_paths, {}, n);
+    generate_paths(all_paths, {}, n);
 
     std::vector<float> path_distances;
 
@@ -769,15 +797,15 @@ void C9()
         path_distances.push_back(path_sum);
     }
 
-    auto it = std::min_element(path_distances.begin(), path_distances.end());
-    auto it2 = std::max_element(path_distances.begin(), path_distances.end());
+    auto it = std::ranges::min_element(path_distances);
+    auto it2 = std::ranges::max_element(path_distances);
 
     Log("Minimum distance for all Places: {}", *it);
     Log("Maximum distance for all Places: {}", *it2);
     Log("Challenge Nine Complete");
 }
 
-void C10()
+static void c10()
 {
     std::string input = "3113322113";
 
@@ -811,14 +839,15 @@ void C10()
         return out;
     };
 
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 50; i++) {
         input = expand(input);
+}
 
     Log("Expanded Sequence Size: {}", input.size());
     Log("Challenge Ten complete");
 }
 
-void C11()
+static void c11()
 {
     std::string input = "hxbxwxba";
 
@@ -828,26 +857,27 @@ void C11()
         digits.at(i) = input.at(i) - 'a';
     }
 
-    std::function<void(std::vector<int> & digits, int rightmost)> Increment;
-    Increment = [&](std::vector<int>& digits, int rightmost)
+    std::function<void(std::vector<int> & digits, int rightmost)> increment;
+    increment = [&](std::vector<int>& digits, int rightmost)
     {
-        if (rightmost == -1)
+        if (rightmost == -1) {
             return;
+}
         digits.at(rightmost) = (digits.at(rightmost) + 1) % 26;
 
         if (digits.at(rightmost) == 0)
         {
-            Increment(digits, rightmost - 1);
+            increment(digits, rightmost - 1);
         }
     };
 
     // Check straight sequences
-    auto CheckStraight = [](const std::vector<int>& digits)
+    auto check_straight = [](const std::vector<int>& digits)
     {
         for (int i = 1; i < digits.size() - 1; ++i)
         {
-            int left_diff = digits.at(i) - digits.at(i - 1);
-            int right_diff = digits.at(i + 1) - digits.at(i);
+            int const left_diff = digits.at(i) - digits.at(i - 1);
+            int const right_diff = digits.at(i + 1) - digits.at(i);
 
             if (left_diff == 1 && right_diff == 1)
             {
@@ -858,11 +888,10 @@ void C11()
     };
 
     // Check ILO
-    auto CheckILO = [](const std::vector<int>& digits)
+    auto check_ilo = [](const std::vector<int>& digits)
     {
-        for (int i = 0; i < digits.size(); ++i)
+        for (int current : digits)
         {
-            int current = digits.at(i);
             if (current == ('i' - 'a') || current == ('l' - 'a') || current == ('o' - 'a'))
             {
                 return false;
@@ -872,56 +901,57 @@ void C11()
     };
 
     // Check Pairs
-    auto CheckDoublePair = [](const std::vector<int>& digits)
+    auto check_double_pair = [](const std::vector<int>& digits)
     {
         int pairs = 0;
         for (int i = 0; i < (int)digits.size() - 1; ++i)
         {
-            int current = digits.at(i);
-            int next = digits.at(i + 1);
+            int const current = digits.at(i);
+            int const next = digits.at(i + 1);
 
             if (current == next)
             {
                 pairs++;
                 i++;
-                if (pairs == 2)
+                if (pairs == 2) {
                     return true;
+}
             }
         }
         return false;
     };
 
-    auto GenPassword = [](const std::vector<int>& digits)
+    auto gen_password = [](const std::vector<int>& digits)
     {
-        std::string newPassword;
+        std::string new_password;
         for (auto digit : digits)
         {
-            newPassword += char(digit) + 'a';
+            new_password += char(digit) + 'a';
         }
-        return newPassword;
+        return new_password;
     };
 
-    bool validPassword = false;
-    while (!validPassword)
+    bool valid_password = false;
+    while (!valid_password)
     {
-        Increment(digits, (int)(digits.size() - 1));
-        validPassword = CheckILO(digits) && CheckDoublePair(digits) && CheckStraight(digits);
+        increment(digits, (int)(digits.size() - 1));
+        valid_password = check_ilo(digits) && check_double_pair(digits) && check_straight(digits);
     }
 
-    Log("Found First Valid Password: {}", GenPassword(digits));
+    Log("Found First Valid Password: {}", gen_password(digits));
 
-    validPassword = false;
-    while (!validPassword)
+    valid_password = false;
+    while (!valid_password)
     {
-        Increment(digits, (int)(digits.size() - 1));
-        validPassword = CheckILO(digits) && CheckDoublePair(digits) && CheckStraight(digits);
+        increment(digits, (int)(digits.size() - 1));
+        valid_password = check_ilo(digits) && check_double_pair(digits) && check_straight(digits);
     }
 
-    Log("Found Second Valid Password: {}", GenPassword(digits));
+    Log("Found Second Valid Password: {}", gen_password(digits));
     Log("Challenge Eleven complete");
 }
 
-void C12()
+static void c12()
 {
     auto input = OpenFileReadStream("input/2015/12.txt");
     if (!input)
@@ -933,46 +963,48 @@ void C12()
     class JSONSumVisitor
     {
     public:
-        double ProcessValue(const JSONValue& v)
+        double process_value(const JSONValue& v)
         {
             return std::visit(*this, v.data);
         }
 
-        double operator()(std::monostate) { return 0.0; };
-        double operator()(bool) { return 0.0; };
+        double operator()(std::monostate /*unused*/) { return 0.0; };
+        double operator()(bool /*unused*/) { return 0.0; };
         double operator()(double v) { return v; };
-        double operator()(const std::string& s) { return 0.0; };
+        double operator()() { return 0.0; };
 
         double operator()(const std::vector<JSONValue>& object)
         {
-            double sum = 0.0f;
-            for (auto& val : object)
+            double sum = 0.0F;
+            for (const auto& val : object)
             {
-                sum += ProcessValue(val);
+                sum += process_value(val);
             }
             return sum;
         }
         double
         operator()(const std::unordered_map<std::string, JSONValue>& object)
         {
-            double sum = 0.0f;
-            for (auto& [key, val] : object)
+            double sum = 0.0F;
+            for (const auto& [key, val] : object)
             {
                 if (val.IsString())
                 {
-                    if (std::get<std::string>(val.data) == "red")
+                    if (std::get<std::string>(val.data) == "red") {
                         return 0.0;
+}
                 }
 
-                sum += ProcessValue(val);
+                sum += process_value(val);
             }
 
-            if (sum != sum)
+            if (sum != sum) {
                 sum = 0.0;
+}
             return sum;
         };
 
-        bool invalidate = false;
+        bool m_invalidate = false;
     };
 
     std::stringstream err;
@@ -986,11 +1018,11 @@ void C12()
     }
 
     Log("Sum of all JSON elements (excluding \"red\"): {}",
-        JSONSumVisitor().ProcessValue(result.value()));
+        JSONSumVisitor().process_value(result.value()));
     Log("Challenge Twelve Complete");
 }
 
-void C13()
+static void c13()
 {
     std::vector<std::string> lines;
 
@@ -1007,8 +1039,9 @@ void C13()
         line.pop_back(); // Pop trailing '.'
         auto tokens = SplitString(line, " ");
 
-        if (tokens.size() < 2)
+        if (tokens.size() < 2) {
             continue;
+}
 
         unique_names.emplace(tokens.front());
         unique_names.emplace(tokens.back());
@@ -1027,7 +1060,7 @@ void C13()
             sign = -1;
         }
 
-        std::string n_str = line.substr(number_index + 5);
+        std::string const n_str = line.substr(number_index + 5);
         if (auto num = ParseNumber<int>(n_str))
         {
             data.emplace_back(tokens.front(), num.value() * sign, tokens.back());
@@ -1036,9 +1069,9 @@ void C13()
 
     std::vector<std::string> names(unique_names.begin(), unique_names.end());
 
-    auto FindIndex = [](std::vector<std::string>& vec, const std::string& look)
+    auto find_index = [](std::vector<std::string>& vec, const std::string& look)
     {
-        auto it = std::find_if(vec.begin(), vec.end(),
+        auto it = std::ranges::find_if(vec,
             [&](const auto& e)
             { return e == look; });
         return it - vec.begin();
@@ -1047,8 +1080,8 @@ void C13()
     AdjacencyMatrix graph { names.size() };
     for (auto& [s, d, e] : data)
     {
-        auto start = FindIndex(names, s);
-        auto end = FindIndex(names, e);
+        auto start = find_index(names, s);
+        auto end = find_index(names, e);
 
         graph.AddDirectedEdge(start, end, static_cast<float>(d));
     }
@@ -1060,13 +1093,13 @@ void C13()
 
     std::function<void(PathArray & out, const Path& path,
         std::unordered_set<size_t> not_visited)>
-        GeneratePaths;
-    GeneratePaths = [&](PathArray& out, const Path& path,
+        generate_paths;
+    generate_paths = [&](PathArray& out, const Path& path,
                         const std::unordered_set<size_t>& not_visited)
     {
         if (not_visited.empty())
         {
-            out.emplace_back(std::move(path));
+            out.emplace_back(path);
         }
         for (auto i : not_visited)
         {
@@ -1076,7 +1109,7 @@ void C13()
             copy.push_back(i);
             n.erase(i);
 
-            GeneratePaths(out, copy, n);
+            generate_paths(out, copy, n);
         }
     };
 
@@ -1084,10 +1117,11 @@ void C13()
 
         PathArray all_paths {};
         std::unordered_set<size_t> n;
-        for (size_t i = 1; i < graph.GetSize(); i++)
+        for (size_t i = 1; i < graph.GetSize(); i++) {
             n.insert(i);
+}
 
-        GeneratePaths(all_paths, { 0 }, n);
+        generate_paths(all_paths, { 0 }, n);
 
         std::vector<float> path_distances;
 
@@ -1099,14 +1133,14 @@ void C13()
                 auto from = path[i];
                 auto to = path[(i + 1) % path.size()];
 
-                float val = (*graph.At(from, to) + *graph.At(to, from));
+                float const val = (*graph.At(from, to) + *graph.At(to, from));
                 path_sum += val;
             }
 
             path_distances.push_back(path_sum);
         }
 
-        auto it = std::max_element(path_distances.begin(), path_distances.end());
+        auto it = std::ranges::max_element(path_distances);
         Log("Happiest Room setup provides: {} happiness", *it);
     }
 
@@ -1118,11 +1152,12 @@ void C13()
         // graph.Print();
 
         std::unordered_set<size_t> m;
-        for (size_t i = 1; i < graph.GetSize(); i++)
+        for (size_t i = 1; i < graph.GetSize(); i++) {
             m.insert(i);
+}
 
         all_paths.clear();
-        GeneratePaths(all_paths, { 0 }, m);
+        generate_paths(all_paths, { 0 }, m);
 
         std::vector<float> path_distances;
         for (auto& path : all_paths)
@@ -1133,35 +1168,35 @@ void C13()
                 auto from = path[i];
                 auto to = path[(i + 1) % path.size()];
 
-                float val = (*graph.At(from, to) + *graph.At(to, from));
+                float const val = (*graph.At(from, to) + *graph.At(to, from));
                 path_sum += val;
             }
 
             path_distances.push_back(path_sum);
         }
 
-        auto it2 = std::max_element(path_distances.begin(), path_distances.end());
+        auto it2 = std::ranges::max_element(path_distances);
         Log("Happiest Room setup provides (including myself): {} happiness", *it2);
     }
     Log("Challenge Thirteen Complete");
 }
 
-void C14()
+static void c14()
 {
     struct Runner
     {
-        std::string name;
-        int speed, sprint_time, rest_time;
+        std::string m_name;
+        int m_speed, m_sprint_time, m_rest_time;
 
-        int CalculateDistance(int seconds) const
+        [[nodiscard]] int calculate_distance(int seconds) const
         {
-            int cycle_time = rest_time + sprint_time;
-            int cycles_complete = seconds / cycle_time;
-            int distance_per_cycle = speed * sprint_time;
-            int remaining_seconds = seconds % cycle_time;
-            int remaining_distance = std::min(remaining_seconds, sprint_time) * speed;
+            int const cycle_time = m_rest_time + m_sprint_time;
+            int const cycles_complete = seconds / cycle_time;
+            int const distance_per_cycle = m_speed * m_sprint_time;
+            int const remaining_seconds = seconds % cycle_time;
+            int const remaining_distance = std::min(remaining_seconds, m_sprint_time) * m_speed;
 
-            return cycles_complete * distance_per_cycle + remaining_distance;
+            return (cycles_complete * distance_per_cycle) + remaining_distance;
         }
     };
 
@@ -1180,22 +1215,23 @@ void C14()
             }
 
             auto words = SplitString(line, " ");
-            if (words.size())
-                all_runners.back().name = words.front();
+            if (!words.empty() != 0u) {
+                all_runners.back().m_name = words.front();
+}
         }
     }
 
     int race_time = 2503;
 
-    std::sort(all_runners.begin(), all_runners.end(),
+    std::ranges::sort(all_runners,
         [&](const auto& lhs, const auto& rhs)
         {
             return lhs.CalculateDistance(race_time) > rhs.CalculateDistance(race_time);
         });
 
     Log("Race 1 - Fastest Racer: {} with a distance of {}",
-        all_runners.front().name,
-        all_runners.front().CalculateDistance(race_time));
+        all_runners.front().m_name,
+        all_runners.front().calculate_distance(race_time));
 
     std::vector<int> distances_travelled;
     distances_travelled.resize(all_runners.size());
@@ -1207,27 +1243,28 @@ void C14()
         for (size_t r = 0; r < all_runners.size(); r++)
         {
             auto& runner = all_runners[r];
-            distances_travelled[r] = runner.CalculateDistance(t);
+            distances_travelled[r] = runner.calculate_distance(t);
         }
 
-        auto it = std::max_element(distances_travelled.begin(),
-            distances_travelled.end());
+        auto it = std::ranges::max_element(distances_travelled
+           );
         for (size_t r = 0; r < all_runners.size(); r++)
         {
-            if (distances_travelled[r] == *it)
+            if (distances_travelled[r] == *it) {
                 score_accumulated[r]++;
+}
         }
     }
 
-    auto it = std::max_element(score_accumulated.begin(), score_accumulated.end());
-    size_t w = it - score_accumulated.begin();
+    auto it = std::ranges::max_element(score_accumulated);
+    size_t const w = it - score_accumulated.begin();
 
-    Log("Race 2 - Pointiest Racer: {} with a score of {}", all_runners[w].name,
+    Log("Race 2 - Pointiest Racer: {} with a score of {}", all_runners[w].m_name,
         *it);
     Log("Challenge Fourteen Complete");
 }
 
-void C15()
+static void c15()
 {
     using InputMatrix = TMat<int, 5, 4>;
     InputMatrix input;
@@ -1240,30 +1277,31 @@ void C15()
         Transposed::ArrayType data {};
 
         size_t r = 0;
-        for (auto line : lines)
+        for (const auto& line : lines)
         {
             auto numbers = ParseAllNumbers<int>(line);
             for (size_t c = 0; c < input.GetRows(); c++)
             {
-                data[r * input.GetRows() + c] = numbers[c];
+                data[(r * input.GetRows()) + c] = numbers[c];
             }
             r++;
         }
 
-        Transposed t = { data };
+        Transposed const t = { data };
         input = t.Transpose();
         input.Print(std::cout);
     }
 
     int result = 0;
 
-    for (int x = 0; x < 100; x++)
-        for (int y = 0; y < 100; y++)
+    for (int x = 0; x < 100; x++) {
+        for (int y = 0; y < 100; y++) {
             for (int z = 0; z < 100; z++)
             {
-                int w = 100 - x - y - z;
-                if (w <= 0)
+                int const w = 100 - x - y - z;
+                if (w <= 0) {
                     continue;
+}
 
                 using TestMat = TMat<int, 4, 1>;
                 auto mul = input.Mul(TestMat({ x, y, z, w }));
@@ -1279,12 +1317,14 @@ void C15()
                     result = std::max(result, val);
                 }
             }
+}
+}
 
     Log("Highest Score Cookie: {}", result);
     Log("Challenge Fifteen Complete!");
 }
 
-void C16()
+static void c16()
 {
     std::vector<std::string> keywords {
         "children", "cats", "samoyeds", "pomeranians", "akitas",
@@ -1306,7 +1346,7 @@ void C16()
     {
         auto lines = SplitStreamIntoLines(input.value());
 
-        for (auto line : lines)
+        for (const auto& line : lines)
         {
             Sue sue {};
             for (size_t i = 0; i < keywords.size(); i++)
@@ -1344,23 +1384,27 @@ void C16()
             auto& s = sue[i];
             auto& m = pattern[i];
 
-            if (s == WILDCARD)
+            if (s == WILDCARD) {
                 continue;
+}
 
             if (i == CAT_NR || i == TREE_NR) // Lower equal
             {
-                if (s <= m)
+                if (s <= m) {
                     match = false;
+}
             }
             else if (i == POMERANIANS_NR || i == GOLDFISH_NR) // Greater equal
             {
-                if (s >= m)
+                if (s >= m) {
                     match = false;
+}
             }
             else // Unequal
             {
-                if (s != m)
+                if (s != m) {
                     match = false;
+}
             }
         }
 
@@ -1374,7 +1418,7 @@ void C16()
     Log("Challenge Sixteen Complete!");
 }
 
-void C17()
+static void c17()
 {
     int target = 150;
     std::vector<int> buckets;
@@ -1382,7 +1426,7 @@ void C17()
     if (auto in = OpenFileReadStream("input/2015/17.txt"))
     {
         auto lines = SplitStreamIntoLines(in.value());
-        for (auto l : lines)
+        for (const auto& l : lines)
         {
             buckets.push_back(ParseNumber<int>(l).value());
         }
@@ -1392,8 +1436,8 @@ void C17()
 
     std::function<void(const std::vector<int>& buckets, int* count, int index,
         int current, int used)>
-        FindCombinations;
-    FindCombinations = [&](const std::vector<int>& buckets, int* count, int index,
+        find_combinations;
+    find_combinations = [&](const std::vector<int>& buckets, int* count, int index,
                            int current, int used) mutable
     {
         if (current == 0)
@@ -1408,19 +1452,19 @@ void C17()
         {
             if (current - buckets[i] >= 0)
             {
-                FindCombinations(buckets, count, i + 1, current - buckets[i], used + 1);
+                find_combinations(buckets, count, i + 1, current - buckets[i], used + 1);
             }
         }
     };
 
     int count = 0;
-    FindCombinations(buckets, &count, 0, target, 0);
+    find_combinations(buckets, &count, 0, target, 0);
 
     Log("{} many ways to arrange {} liters", count, target);
     Log("Challenge Seventeen Complete!");
 }
 
-void C18()
+static void c18()
 {
     std::vector<std::string> lines;
 
@@ -1429,40 +1473,47 @@ void C18()
         lines = SplitStreamIntoLines(in.value());
     }
 
-    size_t width = lines.front().size(), height = lines.size();
+    size_t width = lines.front().size();
+    size_t height = lines.size();
 
     Grid<int> first = { width, height };
     Grid<int> second = { width, height };
 
-    for (size_t j = 0; j < height; j++)
+    for (size_t j = 0; j < height; j++) {
         for (size_t i = 0; i < width; i++)
         {
             auto c = lines[j][i];
-            if (c == '#')
+            if (c == '#') {
                 first.Set(i, j, 1);
-            else
+            } else {
                 first.Set(i, j, 0);
+}
         }
+}
 
     // first.Print();
 
-    auto CheckNeighbours = [](const Grid<int>& in, int x, int y)
+    auto check_neighbours = [](const Grid<int>& in, int x, int y)
     {
         int ret = 0;
-        for (int j = y - 1; j <= y + 1; j++)
+        for (int j = y - 1; j <= y + 1; j++) {
             for (int i = x - 1; i <= x + 1; i++)
             {
-                if (j < 0 || i < 0)
+                if (j < 0 || i < 0) {
                     continue;
-                if (j == y && i == x)
+}
+                if (j == y && i == x) {
                     continue;
+}
 
                 if (auto val = in.At(i, j))
                 {
-                    if (val.value() == 1)
+                    if (val.value() == 1) {
                         ret++;
+}
                 }
             }
+}
         return ret;
     };
 
@@ -1471,7 +1522,7 @@ void C18()
 
     for (size_t t = 0; t < 100; t++)
     {
-        size_t next = (current + 1) % 2;
+        size_t const next = (current + 1) % 2;
 
         auto& in = *selected[current];
         auto& out = *selected[next];
@@ -1482,11 +1533,11 @@ void C18()
         in.Set(0, height - 1, 1);
         in.Set(width - 1, height - 1, 1);
 
-        for (size_t y = 0; y < height; y++)
+        for (size_t y = 0; y < height; y++) {
             for (size_t x = 0; x < width; x++)
             {
-                int val = in.At(x, y).value();
-                int neighbours = CheckNeighbours(in, x, y);
+                int const val = in.At(x, y).value();
+                int const neighbours = check_neighbours(in, x, y);
 
                 int output_val = 2;
 
@@ -1515,6 +1566,7 @@ void C18()
 
                 out.Set(x, y, output_val);
             }
+}
 
         // Set corners
         out.Set(0, 0, 1);
@@ -1528,18 +1580,20 @@ void C18()
     }
 
     size_t on = 0;
-    for (size_t y = 0; y < height; y++)
+    for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++)
         {
-            if (first.At(x, y).value() == 1)
+            if (first.At(x, y).value() == 1) {
                 on++;
+}
         }
+}
 
     Log("Lights on at the end of the Animation: {}", on);
     Log("Challenge Eighteen Complete");
 }
 
-void C19()
+static void c19()
 {
     std::string molecule {};
     std::unordered_map<std::string, std::string> rules {};
@@ -1548,9 +1602,9 @@ void C19()
     {
         auto lines = SplitStreamIntoLines(in.value());
 
-        for (auto l : lines)
+        for (const auto& l : lines)
         {
-            bool is_rule = l.find("=>") != std::string::npos;
+            bool const is_rule = l.find("=>") != std::string::npos;
 
             if (is_rule)
             {
@@ -1572,7 +1626,7 @@ void C19()
         accum.push_back(*it);
 
         auto next = it + 1;
-        if (next == molecule.end() || std::isupper(*next) || *next == 'e')
+        if (next == molecule.end() || (std::isupper(*next) != 0) || *next == 'e')
         {
             elements.emplace_back(accum);
             accum.clear();
@@ -1594,15 +1648,15 @@ void C19()
         }
     }
 
-    size_t result = elements.size() - rn_ar_count - y_count * 2 - 1;
+    size_t result = elements.size() - rn_ar_count - (y_count * 2) - 1;
 
     Log("Minimum replacements needed: {}", result);
     Log("Challenge Nineteen Complete");
 }
 
-void C20()
+static void c20()
 {
-    int puzzle_input = 34000000;
+    int const puzzle_input = 34000000;
 
     /*std::vector<int> precalculated_primes{};
 
@@ -1693,7 +1747,7 @@ void C20()
     auto sum1 = [](int n)
     {
         int sum = 0;
-        int d = (int)sqrt((double)n) + 1;
+        int const d = (int)sqrt((double)n) + 1;
 
         for (int i = 1; i <= d; i++)
         {
@@ -1709,7 +1763,7 @@ void C20()
     auto sum2 = [](int n)
     {
         int sum = 0;
-        int d = (int)std::sqrt((double)n) + 1;
+        int const d = (int)std::sqrt((double)n) + 1;
 
         for (int i = 1; i <= d; i++)
         {
@@ -1729,20 +1783,22 @@ void C20()
     };
 
     int part1 = 0;
-    while (sum1(part1) * 10 < puzzle_input)
+    while (sum1(part1) * 10 < puzzle_input) {
         part1++;
+}
 
     int part2 = 0;
-    while (sum2(part2) * 11 < puzzle_input)
+    while (sum2(part2) * 11 < puzzle_input) {
         part2++;
+}
 
     Log("Answers: {}, {}", part1, part2);
     Log("Challenge Twenty Complete");
 }
 
-void C21()
+static void c21()
 {
-    std::vector<std::pair<int, int>> weapon_shop {
+    std::vector<std::pair<int, int>> const weapon_shop {
         { 8, 4 },
         { 10, 5 },
         { 25, 6 },
@@ -1750,7 +1806,7 @@ void C21()
         { 74, 8 },
     };
 
-    std::vector<std::pair<int, int>> armor_shop {
+    std::vector<std::pair<int, int>> const armor_shop {
         { 0, 0 },
         { 13, 1 },
         { 31, 2 },
@@ -1766,18 +1822,18 @@ void C21()
 
     struct Stats
     {
-        int hitpoints = 0;
-        int armor = 0;
-        int damage = 0;
+        int m_hitpoints = 0;
+        int m_armor = 0;
+        int m_damage = 0;
     };
 
     auto fight = [](const Stats& a, const Stats& b) -> bool
     {
-        int a_att = std::max(a.damage - b.armor, 1);
-        int b_att = std::max(b.damage - a.armor, 1);
+        int const a_att = std::max(a.m_damage - b.m_armor, 1);
+        int const b_att = std::max(b.m_damage - a.m_armor, 1);
 
-        int ha = a.hitpoints;
-        int hb = b.hitpoints;
+        int ha = a.m_hitpoints;
+        int hb = b.m_hitpoints;
 
         while (true)
         {
@@ -1800,40 +1856,43 @@ void C21()
         return a_rounds >= b_rounds;*/
     };
 
-    Stats player = { 100, 0, 0 };
-    Stats boss = { 104, 1, 8 };
+    Stats const player = { .hitpoints=100, .armor=0, .damage=0 };
+    Stats const boss = { .hitpoints=104, .armor=1, .damage=8 };
 
     std::vector<int> gold_amounts {};
 
-    for (auto& selected_weapon : weapon_shop)
+    for (auto& selected_weapon : weapon_shop) {
         for (auto& selected_armor : armor_shop)
         {
-            for (auto& acc1 : ring_shop)
+            for (auto& acc1 : ring_shop) {
                 for (auto& acc2 : ring_shop)
                 {
-                    if (&acc1 == &acc2)
+                    if (&acc1 == &acc2) {
                         continue;
+}
 
                     Stats test = player;
                     int gold_spent = selected_weapon.first + selected_armor.first + std::get<0>(acc1) + std::get<0>(acc2);
-                    test.armor = selected_armor.second + std::get<1>(acc1) + std::get<1>(acc2);
-                    test.damage = selected_weapon.second + std::get<2>(acc1) + std::get<2>(acc2);
+                    test.m_armor = selected_armor.second + std::get<1>(acc1) + std::get<1>(acc2);
+                    test.m_damage = selected_weapon.second + std::get<2>(acc1) + std::get<2>(acc2);
 
                     if (!fight(test, boss))
                     {
-                        Log("Lost battle with: {}/{} - {}", test.damage, test.armor,
+                        Log("Lost battle with: {}/{} - {}", test.m_damage, test.m_armor,
                             gold_spent);
                         gold_amounts.push_back(gold_spent);
                     }
                 }
+}
         }
+}
 
     Log("Minimum gold: {}",
-        *std::max_element(gold_amounts.begin(), gold_amounts.end()));
+        *std::ranges::max_element(gold_amounts));
     Log("Challenge 21 Complete");
 }
 
-void C22()
+static void c22()
 {
     enum class Choice
     {
@@ -1854,50 +1913,51 @@ void C22()
 
     class FightContext
     {
-        int current_health = 50;
-        int current_mana = 500;
-        int total_mana_spent = 0;
+        int m_current_health = 50;
+        int m_current_mana = 500;
+        int m_total_mana_spent = 0;
 
-        int shield_timer = 0;
-        int poison_timer = 0;
-        int recharge_timer = 0;
+        int m_shield_timer = 0;
+        int m_poison_timer = 0;
+        int m_recharge_timer = 0;
 
-        int boss_health = 51;
-        int boss_damage = 9;
+        int m_boss_health = 51;
+        int m_boss_damage = 9;
 
     public:
-        int GetSpent() const { return total_mana_spent; }
+        [[nodiscard]] int get_spent() const { return m_total_mana_spent; }
 
-        State Next(Choice c)
+        State next(Choice c)
         {
             // DOT
 
-            current_health--;
-            if (current_health <= 0)
+            m_current_health--;
+            if (m_current_health <= 0) {
                 return State::DEFEAT;
+}
 
             // Apply effects
 
-            if (shield_timer > 0)
+            if (m_shield_timer > 0)
             {
-                shield_timer--;
+                m_shield_timer--;
             }
 
-            if (poison_timer > 0)
+            if (m_poison_timer > 0)
             {
-                boss_health -= 3;
-                poison_timer--;
+                m_boss_health -= 3;
+                m_poison_timer--;
 
-                if (boss_health <= 0)
+                if (m_boss_health <= 0)
                 {
                     return State::VICTORY;
                 }
             }
 
-            if (recharge_timer > 0)
+            if (m_recharge_timer > 0)
             {
-                recharge_timer--;
-                current_mana += 101;
+                m_recharge_timer--;
+                m_current_mana += 101;
             }
 
             // Use Choice
@@ -1905,65 +1965,75 @@ void C22()
             switch (c)
             {
             case Choice::MISSILE:
-                if (current_mana < 53)
+                if (m_current_mana < 53) {
                     return State::INVALID;
+}
 
-                current_mana -= 53;
-                total_mana_spent += 53;
-                boss_health -= 4;
+                m_current_mana -= 53;
+                m_total_mana_spent += 53;
+                m_boss_health -= 4;
 
-                if (boss_health <= 0)
+                if (m_boss_health <= 0) {
                     return State::VICTORY;
+}
 
                 break;
 
             case Choice::DRAIN:
-                if (current_mana < 73)
+                if (m_current_mana < 73) {
                     return State::INVALID;
-                current_mana -= 73;
-                total_mana_spent += 73;
+}
+                m_current_mana -= 73;
+                m_total_mana_spent += 73;
 
-                current_health += 2;
-                boss_health += -2;
+                m_current_health += 2;
+                m_boss_health += -2;
 
-                if (boss_health <= 0)
+                if (m_boss_health <= 0) {
                     return State::VICTORY;
+}
 
                 break;
 
             case Choice::POISON:
-                if (current_mana < 173)
+                if (m_current_mana < 173) {
                     return State::INVALID;
-                if (poison_timer > 0)
+}
+                if (m_poison_timer > 0) {
                     return State::INVALID;
+}
 
-                current_mana -= 173;
-                total_mana_spent += 173;
-                poison_timer += 6;
+                m_current_mana -= 173;
+                m_total_mana_spent += 173;
+                m_poison_timer += 6;
 
                 break;
 
             case Choice::SHIELD:
-                if (current_mana < 113)
+                if (m_current_mana < 113) {
                     return State::INVALID;
-                if (shield_timer > 0)
+}
+                if (m_shield_timer > 0) {
                     return State::INVALID;
+}
 
-                current_mana -= 113;
-                total_mana_spent += 113;
-                shield_timer += 6;
+                m_current_mana -= 113;
+                m_total_mana_spent += 113;
+                m_shield_timer += 6;
 
                 break;
 
             case Choice::RECHARGE:
-                if (current_mana < 229)
+                if (m_current_mana < 229) {
                     return State::INVALID;
-                if (recharge_timer > 0)
+}
+                if (m_recharge_timer > 0) {
                     return State::INVALID;
+}
 
-                current_mana -= 229;
-                total_mana_spent += 229;
-                recharge_timer += 5;
+                m_current_mana -= 229;
+                m_total_mana_spent += 229;
+                m_recharge_timer += 5;
 
                 break;
             }
@@ -1971,49 +2041,50 @@ void C22()
             // Boss Turn
             int temp_armor = 0;
 
-            if (shield_timer > 0)
+            if (m_shield_timer > 0)
             {
-                shield_timer--;
+                m_shield_timer--;
                 temp_armor = 7;
             }
 
-            if (poison_timer > 0)
+            if (m_poison_timer > 0)
             {
-                boss_health -= 3;
-                poison_timer--;
+                m_boss_health -= 3;
+                m_poison_timer--;
 
-                if (boss_health <= 0)
+                if (m_boss_health <= 0)
                 {
                     return State::VICTORY;
                 }
             }
 
-            if (recharge_timer > 0)
+            if (m_recharge_timer > 0)
             {
-                recharge_timer--;
-                current_mana += 101;
+                m_recharge_timer--;
+                m_current_mana += 101;
             }
 
-            current_health -= std::max(1, boss_damage - temp_armor);
+            m_current_health -= std::max(1, m_boss_damage - temp_armor);
 
-            if (current_health <= 0)
+            if (m_current_health <= 0) {
                 return State::DEFEAT;
+}
 
             return State::RUNNING;
         }
     };
 
-    const FightContext starting {};
+    const FightContext STARTING {};
     int lowest_mana_spent = std::numeric_limits<int>::max();
 
     std::queue<FightContext> queue {};
-    queue.push(starting);
+    queue.push(STARTING);
 
     auto process_choice = [&queue, &lowest_mana_spent](const FightContext& f,
                               Choice c)
     {
         FightContext n = f;
-        State result = n.Next(c);
+        State const result = n.next(c);
 
         switch (result)
         {
@@ -2021,64 +2092,65 @@ void C22()
             queue.push(n);
             break;
         case State::VICTORY:
-            lowest_mana_spent = std::min(lowest_mana_spent, n.GetSpent());
+            lowest_mana_spent = std::min(lowest_mana_spent, n.get_spent());
             break;
         default:
             break;
         }
     };
 
-    while (queue.size())
+    while (!queue.empty() != 0u)
     {
-        const FightContext this_fight = queue.front();
+        const FightContext THIS_FIGHT = queue.front();
         queue.pop();
 
-        if (this_fight.GetSpent() >= lowest_mana_spent)
+        if (THIS_FIGHT.get_spent() >= lowest_mana_spent) {
             continue;
+}
 
-        process_choice(this_fight, Choice::MISSILE);
-        process_choice(this_fight, Choice::DRAIN);
-        process_choice(this_fight, Choice::POISON);
-        process_choice(this_fight, Choice::RECHARGE);
-        process_choice(this_fight, Choice::SHIELD);
+        process_choice(THIS_FIGHT, Choice::MISSILE);
+        process_choice(THIS_FIGHT, Choice::DRAIN);
+        process_choice(THIS_FIGHT, Choice::POISON);
+        process_choice(THIS_FIGHT, Choice::RECHARGE);
+        process_choice(THIS_FIGHT, Choice::SHIELD);
     }
 
     Log("Lowest Mana to defeat boss: {}", lowest_mana_spent);
     Log("Challenge 22 Complete!");
 }
 
-void C23()
+static void c23()
 {
     struct VirtualMachine
     {
         const size_t INSTRUCTION_SIZE = 3;
         const char OFFSET_START = ',';
 
-        const char* HALF = "hlf";
-        const char* TRIPLE = "tpl";
-        const char* INC = "inc";
-        const char* JMP = "jmp";
-        const char* JMP_EVEN = "jie";
-        const char* JMP_ONE = "jio";
+        const char* m_half = "hlf";
+        const char* m_triple = "tpl";
+        const char* m_inc = "inc";
+        const char* m_jmp = "jmp";
+        const char* m_jmp_even = "jie";
+        const char* m_jmp_one = "jio";
 
-        uint32_t registers[2] { 0, 0 };
-        int32_t instruction_ptr { 0 };
+        uint32_t m_registers[2] { 0, 0 };
+        int32_t m_instruction_ptr { 0 };
 
         void run(std::vector<std::string>& program)
         {
             do
             {
-                instruction_ptr = read_line(program[instruction_ptr]);
-            } while (instruction_ptr < (int32_t)program.size() && instruction_ptr >= 0);
+                m_instruction_ptr = read_line(program[m_instruction_ptr]);
+            } while (m_instruction_ptr < (int32_t)program.size() && m_instruction_ptr >= 0);
         }
 
     private:
-        uint32_t get_register(const std::string& line)
+        uint32_t get_register(const std::string& line) const
         {
             return line[1 + INSTRUCTION_SIZE] - 'a';
         }
 
-        int32_t get_number(const std::string& line, size_t off)
+        static int32_t get_number(const std::string& line, size_t off)
         {
             auto view = std::string_view(line).substr(off);
             if (view.starts_with('+'))
@@ -2092,62 +2164,62 @@ void C23()
         int32_t read_line(const std::string& line)
         {
             // HALF
-            if (size_t i = line.find(HALF); i != std::string::npos)
+            if (size_t const i = line.find(m_half); i != std::string::npos)
             {
-                uint32_t reg = get_register(line);
-                registers[reg] /= 2;
-                return instruction_ptr + 1;
+                uint32_t const reg = get_register(line);
+                m_registers[reg] /= 2;
+                return m_instruction_ptr + 1;
             }
 
             // TRIPLE
-            if (size_t i = line.find(TRIPLE); i != std::string::npos)
+            if (size_t const i = line.find(m_triple); i != std::string::npos)
             {
-                uint32_t reg = get_register(line);
-                registers[reg] *= 3;
-                return instruction_ptr + 1;
+                uint32_t const reg = get_register(line);
+                m_registers[reg] *= 3;
+                return m_instruction_ptr + 1;
             }
 
             // INC
-            if (size_t i = line.find(INC); i != std::string::npos)
+            if (size_t const i = line.find(m_inc); i != std::string::npos)
             {
-                uint32_t reg = get_register(line);
-                registers[reg] += 1;
-                return instruction_ptr + 1;
+                uint32_t const reg = get_register(line);
+                m_registers[reg] += 1;
+                return m_instruction_ptr + 1;
             }
 
             // JMP
-            if (size_t i = line.find(JMP); i != std::string::npos)
+            if (size_t const i = line.find(m_jmp); i != std::string::npos)
             {
-                int32_t offset = get_number(line, INSTRUCTION_SIZE + 1);
-                return instruction_ptr + offset;
+                int32_t const offset = get_number(line, INSTRUCTION_SIZE + 1);
+                return m_instruction_ptr + offset;
             }
 
             // JIE
-            if (size_t i = line.find(JMP_EVEN); i != std::string::npos)
+            if (size_t const i = line.find(m_jmp_even); i != std::string::npos)
             {
-                uint32_t reg = get_register(line);
+                uint32_t const reg = get_register(line);
 
-                if (registers[reg] % 2 == 0)
+                if (m_registers[reg] % 2 == 0)
                 {
-                    int32_t offset = get_number(line, line.find(OFFSET_START) + 2);
-                    return instruction_ptr + offset;
+                    int32_t const offset = get_number(line, line.find(OFFSET_START) + 2);
+                    return m_instruction_ptr + offset;
                 }
 
-                return instruction_ptr + 1;
+                return m_instruction_ptr + 1;
             }
 
             // JIO
-            if (size_t i = line.find(JMP_ONE); i != std::string::npos)
+            if (size_t const i = line.find(m_jmp_one); i != std::string::npos)
             {
-                uint32_t reg = get_register(line);
+                uint32_t const reg = get_register(line);
 
-                if (registers[reg] == 1)
+                if (m_registers[reg] == 1)
                 {
-                    int32_t offset = get_number(line, line.find(OFFSET_START) + 2);
-                    return instruction_ptr + offset;
+                    int32_t const offset = get_number(line, line.find(OFFSET_START) + 2);
+                    return m_instruction_ptr + offset;
                 }
 
-                return instruction_ptr + 1;
+                return m_instruction_ptr + 1;
             }
 
             throw;
@@ -2155,7 +2227,7 @@ void C23()
     };
 
     VirtualMachine vm {};
-    vm.registers[0] = 1;
+    vm.m_registers[0] = 1;
 
     if (auto stream = OpenFileReadStream("input/2015/23.txt"))
     {
@@ -2163,11 +2235,11 @@ void C23()
         vm.run(lines);
     }
 
-    Log("Register b : {}", vm.registers[1]);
+    Log("Register b : {}", vm.m_registers[1]);
     Log("Challenge 23 Complete!");
 }
 
-void C24()
+static void c24()
 {
     std::vector<int> all_packages;
 
@@ -2180,7 +2252,7 @@ void C24()
         }
     }
 
-    int box_sum = std::accumulate(all_packages.begin(), all_packages.end(), 0);
+    int const box_sum = std::accumulate(all_packages.begin(), all_packages.end(), 0);
     constexpr int TARGET_SIZE = 6;
 
     auto res = FindCombinations(all_packages, TARGET_SIZE);
@@ -2188,7 +2260,7 @@ void C24()
 
     for (size_t j = 0; j < res.GetHeight(); j++)
     {
-        int sum = std::accumulate(&res(0, j), &res(TARGET_SIZE, j), 0);
+        int const sum = std::accumulate(&res(0, j), &res(TARGET_SIZE, j), 0);
         if (sum == box_sum / 3)
         {
             std::array<int, TARGET_SIZE> t {};
@@ -2202,11 +2274,11 @@ void C24()
         for (size_t i = 1; i < remaining.size(); i++)
         {
             auto check = FindCombinations(remaining, i);
-            size_t width = check.GetWidth();
+            size_t const width = check.GetWidth();
 
             for (size_t j = 0; j < check.GetHeight(); j++)
             {
-                int sum = std::accumulate(&check(0, j), &check(width, j), 0);
+                int const sum = std::accumulate(&check(0, j), &check(width, j), 0);
                 if (sum == target)
                 {
                     return true;
@@ -2225,7 +2297,7 @@ void C24()
 
         for (auto i : p)
         {
-            std::remove_if(remaining.begin(), remaining.end(),
+            std::ranges::remove_if(remaining,
                 [=](const auto& l)
                 { return l == i; });
             remaining.pop_back();
@@ -2245,7 +2317,7 @@ void C24()
 
 int main(int argc, char* argv[])
 {
-    std::cout << "Hello World" << std::endl;
+    std::cout << "Hello World" << '\n';
 
     if (argc > 1 && std::string(argv[1]) == "-T")
     {

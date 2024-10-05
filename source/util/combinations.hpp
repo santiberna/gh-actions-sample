@@ -1,9 +1,11 @@
 #pragma once
 #include "array2d.hpp"
+#include <cstddef>
+#include <vector>
 
-size_t Factorial(size_t n);
+size_t factorial(size_t n);
 
-size_t NumberOfPermutations(size_t set_size, size_t comb_size);
-size_t NumberOfCombinations(size_t set_size, size_t comb_size);
+size_t number_of_permutations(size_t set_size, size_t comb_size);
+size_t number_of_combinations(size_t set_size, size_t comb_size);
 
-Array2D<int> FindCombinations(const std::vector<int>& set, size_t k);
+Array2D<int> find_combinations(const std::vector<int>& set, size_t k);

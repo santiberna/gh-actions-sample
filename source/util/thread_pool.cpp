@@ -1,17 +1,20 @@
 #include "thread_pool.hpp"
+#include <cstdint>
+#include <mutex>
+#include <utility>
 
 ThreadPool::ThreadPool(uint32_t thread_count)
 {
     for (uint32_t i = 0; i < thread_count; ++i)
     {
-        workers.emplace_back(std::thread(&ThreadPool::worker_loop, this));
+        workers.emplace_back(&ThreadPool::worker_loop, this);
     }
 }
 
 ThreadPool::~ThreadPool()
 {
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
+        std::unique_lock<std::mutex> const lock(queue_mutex);
         exit_code = true;
     }
     worker_signal.notify_all();

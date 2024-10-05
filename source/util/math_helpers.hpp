@@ -1,14 +1,16 @@
 #pragma once
+#include <functional>
+#include <cstddef>
 #include <iostream>
 #include "format.hpp"
 #include <vector>
 #include <optional>
 #include <array>
 
-inline int PowerOfInt(int i, int n)
+inline int power_of_int(int i, int n)
 {
     int out = 1;
-    while (n--)
+    while ((n--) != 0)
     {
         out *= i;
     }
@@ -17,17 +19,17 @@ inline int PowerOfInt(int i, int n)
 
 struct Box
 {
-    float x {}, y {}, z {};
+    float m_x {}, m_y {}, m_z {};
 
-    float GetVolume() const;
-    float GetSurfaceArea() const;
-    float GetSmallestSideArea() const;
-    float GetSmallestPerimeter() const;
+    [[nodiscard]] float get_volume() const;
+    [[nodiscard]] float get_surface_area() const;
+    [[nodiscard]] float get_smallest_side_area() const;
+    [[nodiscard]] float get_smallest_perimeter() const;
 };
 
 struct IVec2
 {
-    int x, y;
+    int m_x, m_y;
 };
 
 template <>
@@ -35,7 +37,7 @@ struct std::hash<IVec2>
 {
     size_t operator()(const IVec2& v) const
     {
-        return (static_cast<size_t>(v.x) << 32) + static_cast<size_t>(v.y);
+        return (static_cast<size_t>(v.m_x) << 32) + static_cast<size_t>(v.m_y);
     }
 };
 
@@ -52,12 +54,12 @@ public:
 
     TMat() = default;
     TMat(const std::array<T, R * C>& data)
-        : data(data)
+        : m_data(data)
     {
     }
 
     template <size_t V>
-    TMat<T, R, V> Mul(const TMat<T, C, V>& other) const
+    TMat<T, R, V> mul(const TMat<T, C, V>& other) const
     {
         using Data = std::array<T, R * V>;
         Data result {};
@@ -68,7 +70,7 @@ public:
             {
                 for (size_t c = 0; c < C; c++)
                 {
-                    result[r * V + v] += At(r, c) * other.At(c, v);
+                    result[(r * V) + v] += at(r, c) * other.At(c, v);
                 }
             }
         }
@@ -76,39 +78,40 @@ public:
         return { result };
     }
 
-    TMat<T, C, R> Transpose() const
+    TMat<T, C, R> transpose() const
     {
         using Data = std::array<T, C * R>;
         Data transposed {};
 
-        for (size_t r = 0; r < R; r++)
+        for (size_t r = 0; r < R; r++) {
             for (size_t c = 0; c < C; c++)
             {
-                transposed[c * R + r] = At(r, c);
+                transposed[(c * R) + r] = at(r, c);
             }
+}
 
         return { transposed };
     }
 
-    T At(size_t r, size_t c) const { return data[r * C + c]; }
+    T at(size_t r, size_t c) const { return m_data[(r * C) + c]; }
 
-    void Print(std::ostream& stream) const
+    void print(std::ostream& stream) const
     {
         for (size_t r = 0; r < R; r++)
         {
             for (size_t c = 0; c < C; c++)
             {
-                stream << fmt::format("{:03} ", At(r, c)) << " ";
+                stream << fmt::format("{:03} ", at(r, c)) << " ";
             }
             stream << "\n";
         }
     }
 
-    consteval size_t GetRows() const { return R; }
-    consteval size_t GetCollumns() const { return C; }
+    [[nodiscard]] consteval size_t get_rows() const { return R; }
+    [[nodiscard]] consteval size_t get_collumns() const { return C; }
 
 private:
-    ArrayType data;
+    ArrayType m_data;
 };
 
 template <typename T>
@@ -116,38 +119,43 @@ class VariableMatrix
 {
 public:
     VariableMatrix(size_t width, size_t height)
-        : width(width)
-        , height(height)
+        : m_width(width)
+        , m_height(height)
     {
-        data.resize(width * height);
+        m_data.resize(width * height);
     }
 
-    T* At(size_t x, size_t y)
+    T* at(size_t x, size_t y)
     {
-        if (x >= width)
+        if (x >= m_width) {
             return nullptr;
-        if (y >= height)
+}
+        if (y >= m_height) {
             return nullptr;
+}
 
-        return &data.at(y * width + x);
+        return &m_data.at((y * m_width) + x);
     }
 
-    const T* At(size_t x, size_t y) const
+    const T* at(size_t x, size_t y) const
     {
-        if (x >= width)
+        if (x >= m_width) {
             return nullptr;
-        if (y >= height)
+}
+        if (y >= m_height) {
             return nullptr;
+}
 
-        return &data.at(y * width + x);
+        return &m_data.at((y * m_width) + x);
     }
 
-    std::optional<VariableMatrix<T>> MatMul(const VariableMatrix<T>& other) const
+    std::optional<VariableMatrix<T>> mat_mul(const VariableMatrix<T>& other) const
     {
-        if (width != other.height)
+        if (m_width != other.m_height) {
             return std::nullopt;
-        size_t out_width = other.width;
-        size_t out_height = height;
+}
+        size_t out_width = other.m_width;
+        size_t out_height = m_height;
 
         VariableMatrix<T> out { out_width, out_height };
 
@@ -155,7 +163,7 @@ public:
         {
             for (size_t j = 0; j < out_width; j++)
             {
-                for (size_t k = 0; k < width; k++)
+                for (size_t k = 0; k < m_width; k++)
                 { // aColumn
                     (*out.At(j, i)) += (*At(k, i)) * (*other.At(j, k));
                 }
@@ -165,11 +173,11 @@ public:
         return out;
     }
 
-    void Print()
+    void print()
     {
-        for (size_t y = 0; y < height; y++)
+        for (size_t y = 0; y < m_height; y++)
         {
-            for (size_t x = 0; x < width; x++)
+            for (size_t x = 0; x < m_width; x++)
             {
                 std::cout << fmt::format("{:03} ", *At(x, y));
             }
@@ -177,10 +185,10 @@ public:
         }
     }
 
-    size_t GetCollumns() const { return width; }
-    size_t GetRows() const { return height; }
+    [[nodiscard]] size_t get_collumns() const { return m_width; }
+    [[nodiscard]] size_t get_rows() const { return m_height; }
 
 private:
-    std::vector<T> data;
-    size_t width, height;
+    std::vector<T> m_data;
+    size_t m_width, m_height;
 };

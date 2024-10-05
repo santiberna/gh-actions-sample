@@ -1,12 +1,15 @@
 #include "graph.hpp"
 
+#include <cstddef>
 #include <iostream>
+#include <vector>
+#include "fmt/format.h"
 #include "format.hpp"
 
 AdjacencyMatrix::AdjacencyMatrix(size_t size)
     : width(size)
 {
-    matrix.resize(width * width, 0.0f);
+    matrix.resize(width * width, 0.0F);
 }
 
 void AdjacencyMatrix::AddNode()
@@ -14,9 +17,11 @@ void AdjacencyMatrix::AddNode()
     std::vector<float> new_matrix;
     new_matrix.resize((width + 1) * (width + 1));
 
-    for (size_t y = 0; y < width; y++)
-        for (size_t x = 0; x < width; x++)
-            new_matrix[x + y * (width + 1)] = *At(x, y);
+    for (size_t y = 0; y < width; y++) {
+        for (size_t x = 0; x < width; x++) {
+            new_matrix[x + (y * (width + 1))] = *At(x, y);
+}
+}
 
     matrix = new_matrix;
     width += 1;
@@ -27,7 +32,7 @@ void AdjacencyMatrix::AddUndirectedEdge(size_t start, size_t end, float weight)
     auto* start_to_end = At(start, end);
     auto* end_to_start = At(end, start);
 
-    if (start_to_end && end_to_start)
+    if ((start_to_end != nullptr) && (end_to_start != nullptr))
     {
         (*start_to_end) = weight;
         (*end_to_start) = weight;
@@ -38,7 +43,7 @@ void AdjacencyMatrix::AddDirectedEdge(size_t start, size_t end, float weight)
 {
     auto* start_to_end = At(start, end);
 
-    if (start_to_end)
+    if (start_to_end != nullptr)
     {
         (*start_to_end) = weight;
     }
@@ -46,12 +51,14 @@ void AdjacencyMatrix::AddDirectedEdge(size_t start, size_t end, float weight)
 
 float* AdjacencyMatrix::At(size_t x, size_t y)
 {
-    if (x >= width)
+    if (x >= width) {
         return nullptr;
-    if (y >= width)
+}
+    if (y >= width) {
         return nullptr;
+}
 
-    return &matrix.at(y * width + x);
+    return &matrix.at((y * width) + x);
 }
 
 void AdjacencyMatrix::Print()
