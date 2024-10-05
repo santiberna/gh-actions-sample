@@ -25,7 +25,7 @@ def call_clang_format(files):
 def main():
 
     parser = argparse.ArgumentParser(description='Packages the project to /package/')
-    parser.add_argument('-d', '--directory', help="Directories to Format", type=str, nargs='*')
+    parser.add_argument('-d', '--directory', help="Directories to Format", type=str, nargs='*', required=True)
  
     args = parser.parse_args()
     files = []

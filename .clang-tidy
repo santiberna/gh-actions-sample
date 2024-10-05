@@ -3,7 +3,11 @@ Checks: '
 -*,
 
 modernize-*,
+-modernize-use-trailing-return-type
+
 readability-*,
+-readability-identifier-length
+
 portability-*,
 performance-*,
 misc-*,
