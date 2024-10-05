@@ -60,7 +60,8 @@ def main():
         for directory in args.directory:
             files += glob_recursive_files(directory, EXTENSION)
 
-    files += args.files
+    if args.files:
+        files += args.files
 
     print(f"Processing {len(files)} files.")
 
