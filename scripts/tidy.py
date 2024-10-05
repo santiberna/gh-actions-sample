@@ -15,6 +15,7 @@ COMMAND = 'clang-tidy'
 PROFILE_ENABLE = "--enable-check-profile"
 COMPILE_DATABASE = 'build/Release'
 OPTIONS = '--checks=file'
+APPLY = '--fix'
 
 def glob_recursive_files(path, extensions):
     ret = []
@@ -24,11 +25,19 @@ def glob_recursive_files(path, extensions):
             ret.append(file_path)
     return ret
 
-def run_clang_tidy_on_files(files, profile):
+def run_clang_tidy_on_files(files, profile, fix):
+
+    command = [COMMAND, '-p=' + COMPILE_DATABASE]
 
     if profile:
-        command = [COMMAND, '-p=' + COMPILE_DATABASE, PROFILE_ENABLE, OPTIONS] + files 
+        command.append(PROFILE_ENABLE)
 
+    if fix:
+        command.append(APPLY)
+
+    command += files
+
+    if profile:
         with open(profile, 'w') as file:
             try:
                 subprocess.call(command, stderr=file)
@@ -36,7 +45,6 @@ def run_clang_tidy_on_files(files, profile):
             except subprocess.CalledProcessError as e:
                 print(f"Error running clang-tidy: {e}")
     else:
-        command = [COMMAND, '-p=' + COMPILE_DATABASE, OPTIONS] + files 
         try:
             subprocess.call(command)
 
@@ -46,6 +54,7 @@ def run_clang_tidy_on_files(files, profile):
 def main():
 
     parser = argparse.ArgumentParser(description='Tidy directories of source files')
+    parser.add_argument('-t', '--tidy', help="Apply fices to files", action='store_true')
     parser.add_argument('-d', '--directory', help="Directories to Tidy", type=str, nargs='*')
     parser.add_argument('-f', '--files', help="Files to Tidy", type=str, nargs='*')
     parser.add_argument('-p','--profile', help='Specify output directory to check profile', type=str)
@@ -65,7 +74,7 @@ def main():
 
     print(f"Processing {len(files)} files.")
 
-    run_clang_tidy_on_files(files, args.profile)
+    run_clang_tidy_on_files(files, args.profile, args.tidy)
     end_time = time.time()  
     
     elapsed_time = end_time - start_time
