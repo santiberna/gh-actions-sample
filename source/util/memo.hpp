@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-struct Wrap
+struct wrap
 {
 };
 
@@ -9,25 +9,24 @@ class MemoTable
 {
 private:
     using Functor = Out (*)(MemoTable&, const In&);
-    Functor m_f;
+    Functor f;
 
-    std::unordered_map<In, Out> m_cache;
+    std::unordered_map<In, Out> cache;
 
 public:
     MemoTable(Functor f)
-        : m_f(f)
+        : f(f)
     {
     }
 
     Out operator()(const In& input)
     {
-        auto it = m_cache.find(input);
-        if (it != m_cache.end()) {
+        auto it = cache.find(input);
+        if (it != cache.end())
             return it->second;
-}
 
-        auto ret = m_f(input);
-        m_cache.emplace(input, ret);
+        auto ret = f(input);
+        cache.emplace(input, ret);
 
         return ret;
     }

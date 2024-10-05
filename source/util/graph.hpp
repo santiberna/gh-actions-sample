@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include <optional>
 #include <iostream>
 #include <cstring>
@@ -9,59 +10,55 @@ class Grid
 {
 public:
     Grid(size_t width, size_t height)
-        : m_width(width)
-        , m_height(height)
+        : width(width)
+        , height(height)
     {
-        m_data.resize(width * height);
+        data.resize(width * height);
     }
 
     Grid(T* start, size_t width, size_t height)
-        : m_width(width)
-        , m_height(height)
+        : width(width)
+        , height(height)
     {
-        m_data.resize(width * height);
-        std::memcpy(m_data.data(), start, width * height * sizeof(T));
+        data.resize(width * height);
+        std::memcpy(data.data(), start, width * height * sizeof(T));
     }
 
-    std::optional<T> at(size_t x, size_t y) const
+    std::optional<T> At(size_t x, size_t y) const
     {
-        if (x >= m_width) {
+        if (x >= width)
             return {};
-}
-        if (y >= m_height) {
+        if (y >= height)
             return {};
-}
 
-        return m_data[(y * m_width) + x];
+        return data[y * width + x];
     }
 
-    void set(size_t x, size_t y, T val)
+    void Set(size_t x, size_t y, T val)
     {
-        if (x >= m_width) {
+        if (x >= width)
             throw;
-}
-        if (y >= m_height) {
+        if (y >= height)
             throw;
-}
 
-        m_data[(y * m_width) + x] = val;
+        data[y * width + x] = val;
     }
 
-    void print() const
+    void Print() const
     {
-        for (size_t j = 0; j < m_height; j++)
+        for (size_t j = 0; j < height; j++)
         {
-            for (size_t i = 0; i < m_width; i++)
+            for (size_t i = 0; i < width; i++)
             {
-                std::cout << m_data[(j * m_width) + i] << " ";
+                std::cout << data[j * width + i] << " ";
             }
             std::cout << "\n";
         }
     }
 
 private:
-    size_t m_width, m_height;
-    std::vector<T> m_data;
+    size_t width, height;
+    std::vector<T> data;
 };
 
 class AdjacencyMatrix
@@ -69,17 +66,17 @@ class AdjacencyMatrix
 public:
     AdjacencyMatrix(size_t size);
 
-    void add_node();
+    void AddNode();
 
-    void add_undirected_edge(size_t start, size_t end, float weight);
-    void add_directed_edge(size_t start, size_t end, float weight);
+    void AddUndirectedEdge(size_t start, size_t end, float weight);
+    void AddDirectedEdge(size_t start, size_t end, float weight);
 
-    float* at(size_t x, size_t y);
+    float* At(size_t x, size_t y);
 
-    void print();
-    [[nodiscard]] size_t get_size() const { return m_width; }
+    void Print();
+    size_t GetSize() const { return width; }
 
 private:
-    size_t m_width;
-    std::vector<float> m_matrix;
+    size_t width;
+    std::vector<float> matrix;
 };

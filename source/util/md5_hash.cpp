@@ -1,12 +1,7 @@
 #include "md5_hash.hpp"
-#include <array>
-#include <cstdint>
-#include <vector>
-#include <string>
-#include <cstring>
-#include <cstddef>
+#include <bit>
 
-#include "fmt/format.h"
+#include "log.hpp"
 #include "format.hpp"
 
 constexpr std::array<uint8_t, 64> PADDING = { 0x80 };
@@ -72,11 +67,10 @@ std::vector<uint8_t> PadMessage(const std::vector<uint8_t>& str)
 {
     std::vector<uint8_t> out = str;
 
-    size_t const byte_length = str.size();
-    int necessary_padding = 56 - (static_cast<int>(byte_length) % 64);
-    if (necessary_padding < 0) {
+    size_t byte_length = str.size();
+    int necessary_padding = 56 - static_cast<int>(byte_length) % 64;
+    if (necessary_padding < 0)
         necessary_padding += 64;
-}
 
     out.resize(out.size() + necessary_padding + 8, 0);
     out.at(byte_length) = 0x80;
@@ -91,10 +85,7 @@ std::vector<uint8_t> PadMessage(const std::vector<uint8_t>& str)
 
 void MD5Transform(std::array<uint32_t, 4>& state, const uint8_t* buffer)
 {
-    uint32_t a = state[0];
-    uint32_t b = state[1];
-    uint32_t c = state[2];
-    uint32_t d = state[3];
+    uint32_t a = state[0], b = state[1], c = state[2], d = state[3];
     std::array<uint32_t, 16> x {};
 
     for (size_t i = 0, j = 0; j < 64; ++i, j += 4)
@@ -184,13 +175,13 @@ void MD5Transform(std::array<uint32_t, 4>& state, const uint8_t* buffer)
 Hash128 MD5Hash(const std::vector<uint8_t>& input)
 {
     auto padded = PadMessage(input);
-    size_t const iterations = padded.size() / 64;
+    size_t iterations = padded.size() / 64;
     Hash128 hash {};
     hash.as_uints = I;
 
     for (size_t i = 0; i < iterations; i++)
     {
-        size_t const buffer_start = i * 64;
+        size_t buffer_start = i * 64;
         MD5Transform(hash.as_uints, &padded.at(buffer_start));
     }
 

@@ -1,9 +1,6 @@
 #include "combinations.hpp"
-#include "util/array2d.hpp"
-#include <cstddef>
+#include <numeric>
 #include <algorithm>
-#include <algorithm>
-#include <vector>
 
 Array2D<int> FindCombinations(const std::vector<int>& set, size_t k)
 {
@@ -26,7 +23,7 @@ Array2D<int> FindCombinations(const std::vector<int>& set, size_t k)
         }
         row++;
 
-    } while (std::ranges::next_permutation(v));
+    } while (std::next_permutation(v.begin(), v.end()));
 
     return out;
 }
@@ -34,7 +31,7 @@ Array2D<int> FindCombinations(const std::vector<int>& set, size_t k)
 size_t Factorial(size_t n)
 {
     size_t out = n;
-    while (--n != 0u)
+    while (--n)
     {
         out *= n;
     }
@@ -43,11 +40,10 @@ size_t Factorial(size_t n)
 
 size_t NumberOfPermutations(size_t set_size, size_t comb_size)
 {
-    if (set_size < comb_size) {
+    if (set_size < comb_size)
         return 0;
-}
 
-    size_t const t = set_size - comb_size;
+    size_t t = set_size - comb_size;
     size_t q = set_size;
 
     while (--set_size > t)
@@ -60,8 +56,7 @@ size_t NumberOfPermutations(size_t set_size, size_t comb_size)
 
 size_t NumberOfCombinations(size_t set_size, size_t comb_size)
 {
-    if (set_size < comb_size) {
+    if (set_size < comb_size)
         return 0;
-}
     return NumberOfPermutations(set_size, comb_size) / Factorial(comb_size);
 }

@@ -1,10 +1,11 @@
 #include "math_helpers.hpp"
 
+#include <vector>
 #include <set>
 
 float Box::GetSurfaceArea() const
 {
-    return (2 * x * y) + (2 * y * z) + (2 * z * x);
+    return 2 * x * y + 2 * y * z + 2 * z * x;
 }
 
 float Box::GetSmallestSideArea() const
@@ -26,7 +27,7 @@ float Box::GetSmallestPerimeter() const
     auto first = *it;
     auto second = *(++it);
 
-    return (2 * first) + (2 * second);
+    return 2 * first + 2 * second;
 }
 
 float Box::GetVolume() const
@@ -41,5 +42,5 @@ bool operator==(const IVec2& a, const IVec2& b)
 
 IVec2 operator+(const IVec2& a, const IVec2& b)
 {
-    return { .x=a.x + b.x, .y=a.y + b.y };
+    return { a.x + b.x, a.y + b.y };
 }
