@@ -13,10 +13,6 @@ target_sources(App PRIVATE ${headers} ${sources})
 target_include_directories(App PRIVATE "third-party" "source")
 target_compile_features(App PRIVATE cxx_std_20)
 
-# External library test
-# find_package(Vulkan REQUIRED)
-# target_link_libraries(App PRIVATE ${Vulkan_LIBRARIES} )
-# target_include_directories(App PRIVATE ${Vulkan_INCLUDE_DIRS})
 
 option(ENABLE_PCH "Compile with precompiled header" OFF)
 if (ENABLE_PCH)

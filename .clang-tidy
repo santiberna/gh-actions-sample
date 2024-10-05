@@ -60,11 +60,11 @@ CheckOptions:
     value: ''
 
   # Naming convention for constants
-  - key: readability-identifier-naming.ConstantCase
+  - key: readability-identifier-naming.ConstexprVariableCase
     value: UPPER_CASE
-  - key: readability-identifier-naming.ConstantPrefix
+  - key: readability-identifier-naming.ConstexprVariablePrefix
     value: ''
-  - key: readability-identifier-naming.ConstantSuffix
+  - key: readability-identifier-naming.ConstexprVariablesSuffix
     value: ''
 
   # Naming convention for member variables
