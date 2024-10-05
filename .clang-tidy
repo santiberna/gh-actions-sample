@@ -3,23 +3,43 @@ Checks: '
 -*,
 
 modernize-*,
+-modernize-type-traits,
 -modernize-use-trailing-return-type,
--modernize-use-auto,
+-modernize-use-std-numbers,
+-modernize-macro-to-enum,
+-modernize-use-nullptr,
+-modernize-use-transparent-functors,
+-modernize-replace-auto-ptr,
+-modernize-deprecated-ios-base-aliases,
+-modernize-use-using,
+-modernize-use-bool-literals,
+-modernize-redundant-void-arg
 
 readability-*,
--readability-identifier-length,
 -readability-uppercase-literal-suffix,
--readability-simplify-boolean-expr,
--readability-use-anyofallof,
--readability-else-after-return,
+-readability-non-const-parameter,
+-readability-container-size-empty,
+-readability-implicit-bool-conversion,
 
 performance-*,
+-performance-unnecessary-value-param,
+-performance-move-const-arg,
+-readability-redundant-control-flow,
+-readability-suspicious-call-argument,
+-readability-redundant-declaration,
+-readability-static-definition-in-anonymous-namespace,
 
 misc-*,
--misc-include-cleaner,
+-misc-const-correctness,
+-misc-unused-using-decls,
+-misc-coroutine-hostile-raii,
+-misc-confusable-identifiers,
+-misc-redundant-expression,
+-misc-definitions-in-headers,
+-misc-non-copyable-objects,
+-misc-use-internal-linkage
 
 bugprone-*
-
 cppcoreguidelines-*
 clang-analyzer-*
 
@@ -67,14 +87,6 @@ CheckOptions:
   - key: readability-identifier-naming.VariableSuffix
     value: ''
 
-  # Naming convention for global variables
-  - key: readability-identifier-naming.GlobalVariableCase
-    value: lower_case
-  - key: readability-identifier-naming.GlobalVariablePrefix
-    value: ''
-  - key: readability-identifier-naming.GlobalVariableSuffix
-    value: ''
-
   # Naming convention for constants
   - key: readability-identifier-naming.ConstantCase
     value: UPPER_CASE
@@ -87,16 +99,8 @@ CheckOptions:
   - key: readability-identifier-naming.MemberCase
     value: lower_case
   - key: readability-identifier-naming.MemberPrefix
-    value: '_'
+    value: 'm_'
   - key: readability-identifier-naming.MemberSuffix
-    value: ''
-
-  # Naming convention for private member variables
-  - key: readability-identifier-naming.PrivateMemberCase
-    value: lower_case
-  - key: readability-identifier-naming.PrivateMemberPrefix
-    value: '_'
-  - key: readability-identifier-naming.PrivateMemberSuffix
     value: ''
 
   # Naming convention for parameters
@@ -113,14 +117,6 @@ CheckOptions:
   - key: readability-identifier-naming.TemplateParameterPrefix
     value: ''
   - key: readability-identifier-naming.TemplateParameterSuffix
-    value: ''
-
-  # Naming convention for local variables
-  - key: readability-identifier-naming.LocalVariableCase
-    value: lower_case
-  - key: readability-identifier-naming.LocalVariablePrefix
-    value: ''
-  - key: readability-identifier-naming.LocalVariableSuffix
     value: ''
 
   # Naming convention for namespaces
