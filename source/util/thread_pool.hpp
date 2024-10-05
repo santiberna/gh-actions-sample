@@ -8,17 +8,19 @@
 #include <vector>
 #include <queue>
 
-//Move-only callable
+// Move-only callable
 class Task
 {
-    using CallablePtr = std::unique_ptr<void, void(*)(void*)>;
+    using CallablePtr = std::unique_ptr<void, void (*)(void*)>;
     using InvokeFn = void(void*);
 
 public:
-    template<typename F>
-    Task(F&& f) :
-        callable(new F(std::forward<F>(f)), [](void* p) { delete static_cast<F*>(p); }),
-        invoke([](void* ptr) { (*static_cast<F*>(ptr))(); })
+    template <typename F>
+    Task(F&& f)
+        : callable(new F(std::forward<F>(f)), [](void* p)
+              { delete static_cast<F*>(p); })
+        , invoke([](void* ptr)
+              { (*static_cast<F*>(ptr))(); })
     {
     }
 
@@ -34,7 +36,6 @@ public:
     ~Task() = default;
 
 private:
-
     CallablePtr callable;
     InvokeFn* invoke = nullptr;
 };
@@ -46,7 +47,7 @@ public:
     ~ThreadPool();
     ThreadPool(const ThreadPool&) = delete;
 
-    template<typename F, typename... Args>
+    template <typename F, typename... Args>
     decltype(auto) QueueTask(F&& callable, Args&&... args);
 
     auto GetNumThreadsWorking() const { return threads_working.load(); }
@@ -62,11 +63,11 @@ private:
     std::vector<std::thread> workers;
     std::queue<Task> tasks;
 
-    std::atomic_size_t threads_working{ 0 };
+    std::atomic_size_t threads_working { 0 };
 };
 
-template<typename F, typename ...Args>
-decltype(auto) ThreadPool::QueueTask(F&& callable, Args&& ...args)
+template <typename F, typename... Args>
+decltype(auto) ThreadPool::QueueTask(F&& callable, Args&&... args)
 {
     using ReturnType = std::invoke_result_t<F, Args...>;
 
@@ -82,4 +83,4 @@ decltype(auto) ThreadPool::QueueTask(F&& callable, Args&& ...args)
     return taskFuture;
 }
 
-inline ThreadPool threads{ std::thread::hardware_concurrency() };
+inline ThreadPool threads { std::thread::hardware_concurrency() };
