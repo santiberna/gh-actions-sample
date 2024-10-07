@@ -23,6 +23,9 @@
 #include "util/text_helpers.hpp"
 #include "util/thread_pool.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 namespace Y2015 {
 
 void C1() {
